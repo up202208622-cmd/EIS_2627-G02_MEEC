@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Client Page</title>
+    <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+    <link rel="stylesheet" href="css/client.css">
+</head>
+<body>
+<div class="shell">
+
+    <!-- BARRA LATERAL: só muda de secção dentro desta página -->
+    <aside class="sidebar">
+        <div class="brand">
+            <span class="brand-mark" aria-hidden="true">C</span>
+            <div>
+                <strong>Client Page</strong>
+                <small>Área de cliente</small>
+            </div>
+        </div>
+
+        <nav class="menu" aria-label="Secções da área de cliente">
+            <button type="button" class="menu-item" data-view="new-order">Novo pedido</button>
+            <button type="button" class="menu-item" data-view="products">
+                Os meus produtos <span class="count" id="count-products"></span>
+            </button>
+            <button type="button" class="menu-item" data-view="active">
+                Pedidos ativos <span class="count alert" id="count-active"></span>
+            </button>
+            <button type="button" class="menu-item" data-view="history">
+                Histórico <span class="count" id="count-history"></span>
+            </button>
+        </nav>
+
+        <div class="profile">
+            <span class="avatar" aria-hidden="true">AF</span>
+            <div>
+                <strong>Ana Ferreira</strong>
+                <small>Cliente</small>
+            </div>
+        </div>
+    </aside>
+
+    <div class="main">
+        <header class="topbar">
+            <div class="search" id="search-box">
+                <label for="search" class="sr-only">Pesquisar por número de pedido</label>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+                <input id="search" type="search" placeholder="Pesquisar por número de pedido" autocomplete="off">
+            </div>
+            <time id="clock" class="clock"></time>
+        </header>
+
+        <main>
+            <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+            <!-- NOVO PEDIDO -->
+            <section class="view" id="view-new-order" aria-labelledby="t-new">
+                <h1 id="t-new">Novo pedido</h1>
+
+                <form id="order-form" class="grid-order" novalidate>
+                    <div class="stack">
+                        <div class="error-summary" id="order-summary" role="alert" hidden></div>
+
+                        <div class="card">
+                            <h2>Origem</h2>
+                            <div class="row">
+                                <div class="field">
+                                    <label for="origin-lat">Latitude</label>
+                                    <input id="origin-lat" inputmode="decimal" placeholder="41.1833" data-coord="lat" autocomplete="off">
+                                    <p class="error" id="origin-lat-error"></p>
+                                </div>
+                                <div class="field">
+                                    <label for="origin-long">Longitude</label>
+                                    <input id="origin-long" inputmode="decimal" placeholder="-8.7000" data-coord="long" autocomplete="off">
+                                    <p class="error" id="origin-long-error"></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h2>Destino</h2>
+                            <div class="row">
+                                <div class="field">
+                                    <label for="dest-lat">Latitude</label>
+                                    <input id="dest-lat" inputmode="decimal" placeholder="41.1780" data-coord="lat" autocomplete="off">
+                                    <p class="error" id="dest-lat-error"></p>
+                                </div>
+                                <div class="field">
+                                    <label for="dest-long">Longitude</label>
+                                    <input id="dest-long" inputmode="decimal" placeholder="-8.5980" data-coord="long" autocomplete="off">
+                                    <p class="error" id="dest-long-error"></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <fieldset class="card">
+                            <legend>Produtos do pedido</legend>
+                            <div id="product-picker" class="picker"></div>
+                            <p class="error" id="picker-error"></p>
+                            <dl class="totals">
+                                <div><dt>Peso total</dt><dd id="total-weight">0 kg</dd></div>
+                                <div><dt>Volume total</dt><dd id="total-volume">0 m³</dd></div>
+                            </dl>
+                        </fieldset>
+
+                        <button type="submit" class="btn primary wide">Submeter pedido</button>
+                    </div>
+
+                    <div class="card map-card">
+                        <div class="map-head">
+                            <h2>Mapa</h2>
+                            <div class="segmented" role="group" aria-label="Ponto a definir ao clicar no mapa">
+                                <button type="button" class="seg active" data-point="origin">Marcar origem</button>
+                                <button type="button" class="seg" data-point="dest">Marcar destino</button>
+                            </div>
+                        </div>
+                        <div id="map" role="application" aria-label="Mapa para escolher origem e destino"></div>
+                        <p class="hint">Clique no mapa ou escreva as coordenadas. A rota aparece quando houver origem e destino.</p>
+                    </div>
+                </form>
+            </section>
+
+            <!-- PRODUTOS -->
+            <section class="view" id="view-products" aria-labelledby="t-products" hidden>
+                <h1 id="t-products">Os meus produtos</h1>
+
+                <div class="grid-products">
+                    <form id="product-form" class="card" novalidate>
+                        <h2>Registar produto</h2>
+                        <div class="error-summary" id="product-summary" role="alert" hidden></div>
+
+                        <div class="field">
+                            <label for="p-name">Nome</label>
+                            <input id="p-name" maxlength="80" autocomplete="off">
+                            <p class="error" id="p-name-error"></p>
+                        </div>
+                        <div class="row">
+                            <div class="field">
+                                <label for="p-weight">Peso (kg)</label>
+                                <input id="p-weight" inputmode="decimal" autocomplete="off">
+                                <p class="error" id="p-weight-error"></p>
+                            </div>
+                            <div class="field">
+                                <label for="p-volume">Volume (m³)</label>
+                                <input id="p-volume" inputmode="decimal" autocomplete="off">
+                                <p class="error" id="p-volume-error"></p>
+                            </div>
+                        </div>
+                        <fieldset class="radio-group">
+                            <legend>Frágil</legend>
+                            <div class="radios">
+                                <label><input type="radio" name="p-fragile" value="yes"> Sim</label>
+                                <label><input type="radio" name="p-fragile" value="no"> Não</label>
+                            </div>
+                            <p class="error" id="p-fragile-error"></p>
+                        </fieldset>
+                        <button type="submit" class="btn primary wide">Registar produto</button>
+                    </form>
+
+                    <div class="card table-card">
+                        <div class="table-scroll">
+                            <table>
+                                <thead>
+                                <tr><th>Nome</th><th class="num">Peso</th><th class="num">Volume</th><th>Frágil</th><th><span class="sr-only">Ações</span></th></tr>
+                                </thead>
+                                <tbody id="product-rows"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PEDIDOS ATIVOS -->
+            <section class="view" id="view-active" aria-labelledby="t-active" hidden>
+                <h1 id="t-active">Pedidos ativos</h1>
+                <div id="active-list" class="grid-orders"></div>
+            </section>
+
+            <!-- HISTÓRICO -->
+            <section class="view" id="view-history" aria-labelledby="t-history" hidden>
+                <div class="title-row">
+                    <h1 id="t-history">Histórico</h1>
+                    <div class="chips" role="group" aria-label="Filtrar por estado">
+                        <button type="button" class="chip active" data-filter="all">Todos</button>
+                        <button type="button" class="chip" data-filter="completed">Concluídos</button>
+                        <button type="button" class="chip" data-filter="cancelled">Cancelados</button>
+                    </div>
+                </div>
+                <div class="card table-card">
+                    <div class="table-scroll">
+                        <table>
+                            <thead>
+                            <tr><th>Pedido</th><th>Origem</th><th>Destino</th><th>Produtos</th><th>Estafeta</th><th>Veículo</th><th>Data</th><th>Estado</th></tr>
+                            </thead>
+                            <tbody id="history-rows"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+</div>
+
+<script src="vendor/leaflet/leaflet.js"></script>
+<script src="js/client.js"></script>
+</body>
+</html>
