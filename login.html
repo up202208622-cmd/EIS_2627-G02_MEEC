@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="CourierCMS: sign in to your account.">
+    <title>Login – CourierCMS</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <!-- ===== Cabeçalho / navegação (igual à Home, mas com links para index.html#...) ===== -->
+    <header class="site-header">
+        <div class="container header-inner">
+            <a class="brand" href="index.html">
+                <span class="brand-mark" aria-hidden="true"></span>
+                CourierCMS
+            </a>
+
+            <button class="nav-toggle" id="nav-toggle" type="button"
+                    aria-expanded="false" aria-controls="main-nav">
+                Menu
+            </button>
+
+            <nav class="main-nav" id="main-nav" aria-label="Main navigation">
+                <ul>
+                    <li><a href="index.html#services">Services</a></li>
+                    <li><a href="index.html#how-it-works">How it works</a></li>
+                    <li><a href="index.html#roles">Roles</a></li>
+                    <li><a href="team.html">Team</a></li>
+                </ul>
+                <div class="nav-actions">
+                    <a class="btn btn-ghost" href="login.html" aria-current="page">Login</a>
+                    <a class="btn btn-primary" href="register.html">Register</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main id="main">
+        <section class="section auth-section">
+            <div class="container auth-narrow">
+
+                <!-- Aparece só quando se chega aqui vindo do Register (login.html?registered=...). -->
+                <p class="alert alert-success" id="registered-alert" role="status" hidden></p>
+
+                <!-- novalidate: desliga as mensagens automáticas do browser,
+                     para ser o nosso JavaScript a validar e a mostrar os erros. -->
+                <form class="form-card" id="login-form" novalidate aria-labelledby="login-title">
+                    <h1 id="login-title" class="form-title">Welcome back</h1>
+                    <p class="form-subtitle">Sign in with your email. We take you to your area automatically.</p>
+
+                    <div class="field">
+                        <label for="login-email">Email</label>
+                        <input type="email" id="login-email" name="email" autocomplete="email"
+                               required aria-describedby="login-email-error">
+                        <p class="field-error" id="login-email-error"></p>
+                    </div>
+
+                    <div class="field">
+                        <div class="label-row">
+                            <label for="login-password">Password</label>
+                            <a href="#" id="forgot-link" class="small-link">Forgot password?</a>
+                        </div>
+                        <div class="password-wrap">
+                            <input type="password" id="login-password" name="password"
+                                   autocomplete="current-password" required
+                                   aria-describedby="login-password-error">
+                            <button type="button" class="password-toggle"
+                                    data-toggle-password="login-password" aria-pressed="false">Show</button>
+                        </div>
+                        <p class="field-error" id="login-password-error"></p>
+                    </div>
+
+                    <button class="btn btn-primary btn-block" type="submit">Sign in</button>
+                    <p class="form-status" id="login-status" role="status"></p>
+
+                    <p class="form-switch">New to CourierCMS? <a href="register.html">Create an account</a></p>
+                </form>
+
+                <!-- Contas de teste, para quem avalia conseguir entrar em cada área. -->
+                <details class="demo-box">
+                    <summary>Demo accounts</summary>
+                    <table>
+                        <thead><tr><th>Role</th><th>Email</th><th>Password</th></tr></thead>
+                        <tbody>
+                            <tr><td>Client</td><td>client@demo.com</td><td>Client123</td></tr>
+                            <tr><td>Courier</td><td>courier@demo.com</td><td>Courier123</td></tr>
+                            <tr><td>Staff</td><td>staff@couriercms.com</td><td>Staff1234</td></tr>
+                            <tr><td>Admin</td><td>admin@couriercms.com</td><td>Admin1234</td></tr>
+                        </tbody>
+                    </table>
+                </details>
+
+            </div>
+        </section>
+    </main>
+
+    <!-- ===== Rodapé ===== -->
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <p>&copy; <span id="year">2026</span> CourierCMS · Enterprise Information Systems project</p>
+            <ul>
+                <li><a href="team.html">Team</a></li>
+                <li><a href="login.html">Login</a></li>
+            </ul>
+        </div>
+    </footer>
+
+    <script src="js/nav.js"></script>
+    <script src="js/validation.js"></script>
+    <script src="js/users.js"></script>
+    <script src="js/login.js"></script>
+</body>
+</html>
