@@ -1,41 +1,41 @@
-/* Client Page (Sprint 1): protótipo estático, sem servidor.
-   Os dados vivem em memória e voltam aos de exemplo ao recarregar a página. */
+/* Client page (Sprint 1): static prototype, no server.
+   Data lives in memory and goes back to the sample data when the page is reloaded. */
 "use strict";
 
 const FEUP = [41.1780, -8.5980];
 
-/* ---------- Dados de exemplo ---------- */
+/* ---------- Sample data ---------- */
 const products = [
-    { id: 1, name: "Caixa de livros", weight: 12.5, volume: 0.04, fragile: false },
+    { id: 1, name: "Box of books", weight: 12.5, volume: 0.04, fragile: false },
     { id: 2, name: "Monitor 27\"", weight: 6.8, volume: 0.09, fragile: true },
-    { id: 3, name: "Conjunto de copos", weight: 2.4, volume: 0.02, fragile: true },
-    { id: 4, name: "Cadeira de escritório", weight: 14, volume: 0.35, fragile: false }
+    { id: 3, name: "Set of glasses", weight: 2.4, volume: 0.02, fragile: true },
+    { id: 4, name: "Office chair", weight: 14, volume: 0.35, fragile: false }
 ];
 
 const orders = [
     { id: "PD-1048", origin: [41.1496, -8.6109], dest: [41.1780, -8.5980], items: [3], status: "pending", courier: null, vehicle: null, date: "2026-11-08" },
-    { id: "PD-1047", origin: [41.1780, -8.5980], dest: [41.1496, -8.6109], items: [1], status: "progress", courier: "Rui Santos", vehicle: "Moto · 45-TX-82", date: "2026-11-07" },
+    { id: "PD-1047", origin: [41.1780, -8.5980], dest: [41.1496, -8.6109], items: [1], status: "progress", courier: "Rui Martins", vehicle: "Moto · 45-TX-82", date: "2026-11-07" },
     { id: "PD-1046", origin: [41.1579, -8.6291], dest: [41.2356, -8.6200], items: [2], status: "initiated", courier: "Marta Lopes", vehicle: "Van · 17-RD-30", date: "2026-11-06" },
     { id: "PD-1039", origin: [41.2010, -8.6420], dest: [41.1579, -8.6291], items: [4], status: "completed", courier: "Marta Lopes", vehicle: "Van · 17-RD-30", date: "2026-10-29" },
-    { id: "PD-1035", origin: [41.1496, -8.6109], dest: [41.2010, -8.6420], items: [1, 3], status: "completed", courier: "Rui Santos", vehicle: "Moto · 45-TX-82", date: "2026-10-22" },
+    { id: "PD-1035", origin: [41.1496, -8.6109], dest: [41.2010, -8.6420], items: [1, 3], status: "completed", courier: "Rui Martins", vehicle: "Moto · 45-TX-82", date: "2026-10-22" },
     { id: "PD-1031", origin: [41.1780, -8.5980], dest: [41.1800, -8.5500], items: [2], status: "cancelled", courier: "Marta Lopes", vehicle: "Van · 17-RD-30", date: "2026-10-15" }
 ];
 
 const STATUS = {
-    pending:   "A aguardar estafeta",
-    initiated: "Iniciado",
-    progress:  "Em curso",
-    completed: "Concluído",
-    cancelled: "Cancelado"
+    pending:   "Awaiting courier",
+    initiated: "Initiated",
+    progress:  "In progress",
+    completed: "Completed",
+    cancelled: "Cancelled"
 };
 const FLOW = ["pending", "initiated", "progress", "completed"];
-const STEP_LABELS = ["Pendente", "Iniciado", "Em curso", "Concluído"];
+const STEP_LABELS = ["Pending", "Initiated", "In progress", "Completed"];
 
 let nextProductId = 5;
 let nextOrderNumber = 1049;
 let historyFilter = "all";
 
-/* ---------- Utilitários ---------- */
+/* ---------- Helpers ---------- */
 const $ = (id) => document.getElementById(id);
 
 function esc(text) {
@@ -44,14 +44,14 @@ function esc(text) {
     return div.innerHTML;
 }
 
-const fmt = (n, digits) => n.toLocaleString("pt-PT", { maximumFractionDigits: digits });
+const fmt = (n, digits) => n.toLocaleString("en-GB", { maximumFractionDigits: digits });
 const coord = (c) => `${c[0].toFixed(4)}, ${c[1].toFixed(4)}`;
 const isActive = (o) => o.status !== "completed" && o.status !== "cancelled";
 const productById = (id) => products.find((p) => p.id === id);
 const orderProducts = (o) => o.items.map((id) => {
     const p = productById(id);
-    if (!p) return "Produto removido";
-    return p.fragile ? `${p.name} (frágil)` : p.name;
+    if (!p) return "Removed product";
+    return p.fragile ? `${p.name} (fragile)` : p.name;
 }).join(", ");
 
 function parseNumber(raw) {
@@ -67,7 +67,7 @@ function setError(input, errorEl, message) {
 
 function showSummary(el, count) {
     el.hidden = count === 0;
-    el.textContent = count === 1 ? "Corrija 1 campo antes de submeter." : `Corrija ${count} campos antes de submeter.`;
+    el.textContent = count === 1 ? "Fix 1 field before submitting." : `Fix ${count} fields before submitting.`;
 }
 
 /* O aviso geral desaparece assim que o utilizador começa a corrigir. */
@@ -83,7 +83,7 @@ function toast(message) {
     toastTimer = setTimeout(() => { el.hidden = true; }, 4000);
 }
 
-/* ---------- Navegação entre secções ---------- */
+/* ---------- Section navigation ---------- */
 let map;
 
 function showView(name) {
@@ -130,7 +130,7 @@ function drawPoint(point, latLng) {
     }
     if (latLng) {
         markers[point] = L.marker(latLng, { icon: pinIcon(point) })
-            .bindPopup(`${point === "origin" ? "Origem" : "Destino"}: ${coord(latLng)}`)
+            .bindPopup(`${point === "origin" ? "Origin" : "Destination"}: ${coord(latLng)}`)
             .addTo(map);
     }
 
@@ -170,13 +170,13 @@ document.querySelectorAll(".seg").forEach((b) => {
     b.addEventListener("click", () => setActivePoint(b.dataset.point));
 });
 
-/* ---------- Validação das coordenadas ---------- */
+/* ---------- Coordinate validation ---------- */
 function coordError(raw, kind) {
-    if (!raw.trim()) return "Campo obrigatório.";
+    if (!raw.trim()) return "This field is required.";
     const value = parseNumber(raw);
-    if (Number.isNaN(value)) return "Introduza um número (ex.: 41.1780).";
+    if (Number.isNaN(value)) return "Enter a number (e.g. 41.1780).";
     const limit = kind === "lat" ? 90 : 180;
-    if (Math.abs(value) > limit) return `Tem de estar entre -${limit} e ${limit}.`;
+    if (Math.abs(value) > limit) return `Must be between -${limit} and ${limit}.`;
     return "";
 }
 
@@ -214,17 +214,17 @@ function validateCoordPair(prefix) {
     });
 });
 
-/* ---------- Seleção de produtos no pedido ---------- */
+/* ---------- Product selection in the order ---------- */
 function renderPicker() {
     const checked = selectedIds();
     $("product-picker").innerHTML = products.length
         ? products.map((p) => `
             <label class="pick">
                 <input type="checkbox" value="${p.id}" ${checked.includes(p.id) ? "checked" : ""}>
-                <span>${esc(p.name)}${p.fragile ? '<em class="tag">Frágil</em>' : ""}</span>
+                <span>${esc(p.name)}${p.fragile ? '<em class="tag">Fragile</em>' : ""}</span>
                 <small>${fmt(p.weight, 2)} kg · ${fmt(p.volume, 3)} m³</small>
             </label>`).join("")
-        : `<p class="hint">Ainda não tem produtos. Registe um em "Os meus produtos".</p>`;
+        : `<p class="hint">You have no products yet. Register one in "My products".</p>`;
     updateTotals();
 }
 
@@ -243,21 +243,21 @@ $("product-picker").addEventListener("change", () => {
     if (selectedIds().length) $("picker-error").textContent = "";
 });
 
-/* ---------- Submeter pedido ---------- */
+/* ---------- Submit order ---------- */
 $("order-form").addEventListener("submit", (e) => {
     e.preventDefault();
 
     let errors = validateCoordPair("origin") + validateCoordPair("dest");
 
     if (!selectedIds().length) {
-        $("picker-error").textContent = "Selecione pelo menos um produto.";
+        $("picker-error").textContent = "Select at least one product.";
         errors++;
     }
 
     const origin = readCoordPair("origin");
     const dest = readCoordPair("dest");
     if (origin && dest && origin[0] === dest[0] && origin[1] === dest[1]) {
-        setError($("dest-lat"), $("dest-lat-error"), "O destino tem de ser diferente da origem.");
+        setError($("dest-lat"), $("dest-lat-error"), "The destination must be different from the origin.");
         errors++;
     }
 
@@ -281,7 +281,7 @@ $("order-form").addEventListener("submit", (e) => {
     renderPicker();
     renderOrders();
     showView("active");
-    toast(`Pedido ${id} submetido.`);
+    toast(`Order ${id} submitted.`);
 });
 
 /* ---------- Produtos ---------- */
@@ -291,11 +291,11 @@ const firstFragileRadio = document.querySelector('input[name="p-fragile"]');
 
 function productError(id) {
     const value = $(id).value;
-    if (!value.trim()) return "Campo obrigatório.";
+    if (!value.trim()) return "This field is required.";
     if (id === "p-weight" || id === "p-volume") {
         const n = parseNumber(value);
-        if (Number.isNaN(n)) return "Introduza um número.";
-        if (n <= 0) return "Tem de ser maior que 0.";
+        if (Number.isNaN(n)) return "Enter a number.";
+        if (n <= 0) return "Must be greater than 0.";
     }
     return "";
 }
@@ -318,7 +318,7 @@ $("product-form").addEventListener("submit", (e) => {
         setError($(id), $(`${id}-error`), message);
         if (message) errors++;
     });
-    const fragileMessage = fragileChoice() ? "" : "Indique se o produto é frágil.";
+    const fragileMessage = fragileChoice() ? "" : "Say whether the product is fragile.";
     setError(firstFragileRadio, $("p-fragile-error"), fragileMessage);
     if (fragileMessage) errors++;
 
@@ -339,7 +339,7 @@ $("product-form").addEventListener("submit", (e) => {
     e.target.reset();
     renderProducts();
     renderPicker();
-    toast(`Produto "${name}" registado.`);
+    toast(`Product "${name}" registered.`);
 });
 
 function renderProducts() {
@@ -350,10 +350,10 @@ function renderProducts() {
                 <td>${esc(p.name)}</td>
                 <td class="num nowrap">${fmt(p.weight, 2)} kg</td>
                 <td class="num nowrap">${fmt(p.volume, 3)} m³</td>
-                <td>${p.fragile ? '<span class="badge initiated">Sim</span>' : "Não"}</td>
-                <td class="num"><button type="button" class="btn-remove" data-id="${p.id}" aria-label="Remover ${esc(p.name)}">Remover</button></td>
+                <td>${p.fragile ? '<span class="badge initiated">Yes</span>' : "No"}</td>
+                <td class="num"><button type="button" class="btn-remove" data-id="${p.id}" aria-label="Remove ${esc(p.name)}">Remove</button></td>
             </tr>`).join("")
-        : `<tr><td colspan="5" class="empty">Ainda não tem produtos registados.</td></tr>`;
+        : `<tr><td colspan="5" class="empty">You have no registered products yet.</td></tr>`;
 }
 
 $("product-rows").addEventListener("click", (e) => {
@@ -361,7 +361,7 @@ $("product-rows").addEventListener("click", (e) => {
     if (!button) return;
     const id = Number(button.dataset.id);
     if (orders.some((o) => isActive(o) && o.items.includes(id))) {
-        toast("Este produto está num pedido ativo e não pode ser removido.");
+        toast("This product is in an active order and cannot be removed.");
         return;
     }
     products.splice(products.findIndex((p) => p.id === id), 1);
@@ -369,7 +369,7 @@ $("product-rows").addEventListener("click", (e) => {
     renderPicker();
 });
 
-/* ---------- Pedidos ativos e histórico ---------- */
+/* ---------- Active orders and history ---------- */
 function stepper(status) {
     const current = FLOW.indexOf(status);
     return `<ol class="progress-steps">${STEP_LABELS.map((label, i) => {
@@ -397,15 +397,15 @@ function renderOrders() {
                     <span class="badge ${o.status}">${STATUS[o.status]}</span>
                 </div>
                 <dl class="facts">
-                    <div><dt>Origem</dt><dd>${coord(o.origin)}</dd></div>
-                    <div><dt>Destino</dt><dd>${coord(o.dest)}</dd></div>
-                    <div class="full"><dt>Produtos</dt><dd>${esc(orderProducts(o))}</dd></div>
-                    <div><dt>Estafeta</dt><dd>${o.courier || "Por atribuir"}</dd></div>
-                    <div><dt>Veículo</dt><dd>${o.vehicle || "Por atribuir"}</dd></div>
+                    <div><dt>Origin</dt><dd>${coord(o.origin)}</dd></div>
+                    <div><dt>Destination</dt><dd>${coord(o.dest)}</dd></div>
+                    <div class="full"><dt>Products</dt><dd>${esc(orderProducts(o))}</dd></div>
+                    <div><dt>Courier</dt><dd>${o.courier || "Unassigned"}</dd></div>
+                    <div><dt>Vehicle</dt><dd>${o.vehicle || "Unassigned"}</dd></div>
                 </dl>
                 ${stepper(o.status)}
             </article>`).join("")
-        : `<div class="card empty">${term ? "Nenhum pedido ativo com esse número." : "Não tem pedidos ativos."}</div>`;
+        : `<div class="card empty">${term ? "No active order with that number." : "You have no active orders."}</div>`;
 
     const doneShown = done.filter((o) => matches(o) && (historyFilter === "all" || o.status === historyFilter));
     $("history-rows").innerHTML = doneShown.length
@@ -417,10 +417,10 @@ function renderOrders() {
                 <td>${esc(orderProducts(o))}</td>
                 <td class="nowrap">${o.courier || "—"}</td>
                 <td class="nowrap">${o.vehicle || "—"}</td>
-                <td class="nowrap">${new Date(o.date).toLocaleDateString("pt-PT")}</td>
+                <td class="nowrap">${new Date(o.date).toLocaleDateString("en-GB")}</td>
                 <td><span class="badge ${o.status}">${STATUS[o.status]}</span></td>
             </tr>`).join("")
-        : `<tr><td colspan="8" class="empty">Sem pedidos para mostrar.</td></tr>`;
+        : `<tr><td colspan="8" class="empty">No orders to show.</td></tr>`;
 }
 
 $("search").addEventListener("input", renderOrders);
@@ -433,14 +433,14 @@ document.querySelectorAll(".chip").forEach((chip) => {
     });
 });
 
-/* ---------- Relógio ---------- */
+/* ---------- Clock ---------- */
 function tick() {
-    $("clock").textContent = new Date().toLocaleString("pt-PT", {
+    $("clock").textContent = new Date().toLocaleString("en-GB", {
         weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit"
     });
 }
 
-/* ---------- Arranque ---------- */
+/* ---------- Start-up ---------- */
 initMap();
 renderProducts();
 renderPicker();

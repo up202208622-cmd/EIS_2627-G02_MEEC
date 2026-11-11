@@ -1,71 +1,79 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Client Page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="CourierCMS client area: create orders, register products and follow your deliveries.">
+    <title>Client – CourierCMS</title>
     <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/client.css">
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
 <div class="shell">
 
-    <!-- BARRA LATERAL: só muda de secção dentro desta página -->
+    <!-- Sidebar: only switches section inside this page (same layout as the Admin page) -->
     <aside class="sidebar">
-        <div class="brand">
+        <a class="brand" href="index.html">
             <span class="brand-mark" aria-hidden="true"></span>
             <div>
-                <strong>Client Page</strong>
-                <small>Área de cliente</small>
+                <strong>CourierCMS</strong>
+                <small>Client area</small>
             </div>
-        </div>
+        </a>
 
-        <nav class="menu" aria-label="Secções da área de cliente">
-            <button type="button" class="menu-item" data-view="new-order">Novo pedido</button>
+        <nav class="menu" aria-label="Client area sections">
+            <button type="button" class="menu-item" data-view="new-order">New order</button>
             <button type="button" class="menu-item" data-view="products">
-                Os meus produtos <span class="count" id="count-products"></span>
+                My products <span class="count" id="count-products"></span>
             </button>
             <button type="button" class="menu-item" data-view="active">
-                Pedidos ativos <span class="count alert" id="count-active"></span>
+                Active orders <span class="count alert" id="count-active"></span>
             </button>
             <button type="button" class="menu-item" data-view="history">
-                Histórico <span class="count" id="count-history"></span>
+                History <span class="count" id="count-history"></span>
             </button>
         </nav>
 
+        <nav class="menu menu-links" aria-label="Other areas">
+            <a class="menu-item" href="index.html">Home page</a>
+            <a class="menu-item" href="team.html">Team</a>
+        </nav>
+
         <div class="profile">
-            <span class="avatar" aria-hidden="true">AF</span>
+            <span class="avatar" aria-hidden="true">AC</span>
             <div>
-                <strong>Ana Ferreira</strong>
-                <small>Cliente</small>
+                <strong>Ana Costa</strong>
+                <small>Client</small>
             </div>
+            <a class="logout" href="login.html" title="Log out" aria-label="Log out">Log out</a>
         </div>
     </aside>
 
     <div class="main">
         <header class="topbar">
             <div class="search" id="search-box">
-                <label for="search" class="visually-hidden">Pesquisar por número de pedido</label>
+                <label for="search" class="visually-hidden">Search by order number</label>
                 <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
-                <input id="search" type="search" placeholder="Pesquisar por número de pedido" autocomplete="off">
+                <input id="search" type="search" placeholder="Search by order number" autocomplete="off">
             </div>
             <time id="clock" class="clock"></time>
         </header>
 
-        <main>
+        <main id="main">
             <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 
             <!-- NOVO PEDIDO -->
             <section class="view" id="view-new-order" aria-labelledby="t-new">
-                <h1 id="t-new">Novo pedido</h1>
+                <h1 id="t-new">New order</h1>
 
                 <form id="order-form" class="grid-order" novalidate>
                     <div class="stack">
                         <div class="error-summary" id="order-summary" role="alert" hidden></div>
 
                         <div class="card">
-                            <h2>Origem</h2>
+                            <h2>Origin</h2>
                             <div class="row">
                                 <div class="field">
                                     <label for="origin-lat">Latitude</label>
@@ -81,7 +89,7 @@
                         </div>
 
                         <div class="card">
-                            <h2>Destino</h2>
+                            <h2>Destination</h2>
                             <div class="row">
                                 <div class="field">
                                     <label for="dest-lat">Latitude</label>
@@ -97,49 +105,49 @@
                         </div>
 
                         <fieldset class="card">
-                            <legend>Produtos do pedido</legend>
+                            <legend>Order products</legend>
                             <div id="product-picker" class="picker"></div>
                             <p class="error" id="picker-error"></p>
                             <dl class="totals">
-                                <div><dt>Peso total</dt><dd id="total-weight">0 kg</dd></div>
-                                <div><dt>Volume total</dt><dd id="total-volume">0 m³</dd></div>
+                                <div><dt>Total weight</dt><dd id="total-weight">0 kg</dd></div>
+                                <div><dt>Total volume</dt><dd id="total-volume">0 m³</dd></div>
                             </dl>
                         </fieldset>
 
-                        <button type="submit" class="btn btn-primary btn-block">Submeter pedido</button>
+                        <button type="submit" class="btn btn-primary btn-block">Submit order</button>
                     </div>
 
                     <div class="card map-card">
                         <div class="map-head">
-                            <h2>Mapa</h2>
-                            <div class="segmented" role="group" aria-label="Ponto a definir ao clicar no mapa">
-                                <button type="button" class="seg active" data-point="origin">Marcar origem</button>
-                                <button type="button" class="seg" data-point="dest">Marcar destino</button>
+                            <h2>Map</h2>
+                            <div class="segmented" role="group" aria-label="Point to set when clicking the map">
+                                <button type="button" class="seg active" data-point="origin">Set origin</button>
+                                <button type="button" class="seg" data-point="dest">Set destination</button>
                             </div>
                         </div>
-                        <div id="map" class="map" role="application" aria-label="Mapa para escolher origem e destino"></div>
-                        <p class="hint">Clique no mapa ou escreva as coordenadas. A rota aparece quando houver origem e destino.</p>
+                        <div id="map" class="map" role="application" aria-label="Map to choose origin and destination"></div>
+                        <p class="hint">Click the map or type the coordinates. The route appears once there is an origin and a destination.</p>
                     </div>
                 </form>
             </section>
 
             <!-- PRODUTOS -->
             <section class="view" id="view-products" aria-labelledby="t-products" hidden>
-                <h1 id="t-products">Os meus produtos</h1>
+                <h1 id="t-products">My products</h1>
 
                 <div class="grid-products">
                     <form id="product-form" class="card" novalidate>
-                        <h2>Registar produto</h2>
+                        <h2>Register product</h2>
                         <div class="error-summary" id="product-summary" role="alert" hidden></div>
 
                         <div class="field">
-                            <label for="p-name">Nome</label>
+                            <label for="p-name">Name</label>
                             <input id="p-name" maxlength="80" autocomplete="off">
                             <p class="error" id="p-name-error"></p>
                         </div>
                         <div class="row">
                             <div class="field">
-                                <label for="p-weight">Peso (kg)</label>
+                                <label for="p-weight">Weight (kg)</label>
                                 <input id="p-weight" inputmode="decimal" autocomplete="off">
                                 <p class="error" id="p-weight-error"></p>
                             </div>
@@ -150,21 +158,21 @@
                             </div>
                         </div>
                         <fieldset class="radio-group">
-                            <legend>Frágil</legend>
+                            <legend>Fragile</legend>
                             <div class="radios">
-                                <label><input type="radio" name="p-fragile" value="yes"> Sim</label>
-                                <label><input type="radio" name="p-fragile" value="no"> Não</label>
+                                <label><input type="radio" name="p-fragile" value="yes"> Yes</label>
+                                <label><input type="radio" name="p-fragile" value="no"> No</label>
                             </div>
                             <p class="error" id="p-fragile-error"></p>
                         </fieldset>
-                        <button type="submit" class="btn btn-primary btn-block">Registar produto</button>
+                        <button type="submit" class="btn btn-primary btn-block">Register product</button>
                     </form>
 
                     <div class="card table-card">
                         <div class="table-scroll">
                             <table>
                                 <thead>
-                                <tr><th>Nome</th><th class="num">Peso</th><th class="num">Volume</th><th>Frágil</th><th><span class="visually-hidden">Ações</span></th></tr>
+                                <tr><th>Name</th><th class="num">Weight</th><th class="num">Volume</th><th>Fragile</th><th><span class="visually-hidden">Actions</span></th></tr>
                                 </thead>
                                 <tbody id="product-rows"></tbody>
                             </table>
@@ -175,25 +183,25 @@
 
             <!-- PEDIDOS ATIVOS -->
             <section class="view" id="view-active" aria-labelledby="t-active" hidden>
-                <h1 id="t-active">Pedidos ativos</h1>
+                <h1 id="t-active">Active orders</h1>
                 <div id="active-list" class="grid-orders"></div>
             </section>
 
             <!-- HISTÓRICO -->
             <section class="view" id="view-history" aria-labelledby="t-history" hidden>
                 <div class="title-row">
-                    <h1 id="t-history">Histórico</h1>
-                    <div class="chips" role="group" aria-label="Filtrar por estado">
-                        <button type="button" class="chip active" data-filter="all">Todos</button>
-                        <button type="button" class="chip" data-filter="completed">Concluídos</button>
-                        <button type="button" class="chip" data-filter="cancelled">Cancelados</button>
+                    <h1 id="t-history">History</h1>
+                    <div class="chips" role="group" aria-label="Filter by status">
+                        <button type="button" class="chip active" data-filter="all">All</button>
+                        <button type="button" class="chip" data-filter="completed">Completed</button>
+                        <button type="button" class="chip" data-filter="cancelled">Cancelled</button>
                     </div>
                 </div>
                 <div class="card table-card">
                     <div class="table-scroll">
                         <table>
                             <thead>
-                            <tr><th>Pedido</th><th>Origem</th><th>Destino</th><th>Produtos</th><th>Estafeta</th><th>Veículo</th><th>Data</th><th>Estado</th></tr>
+                            <tr><th>Order</th><th>Origin</th><th>Destination</th><th>Products</th><th>Courier</th><th>Vehicle</th><th>Date</th><th>Status</th></tr>
                             </thead>
                             <tbody id="history-rows"></tbody>
                         </table>

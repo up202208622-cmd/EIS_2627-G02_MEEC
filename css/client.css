@@ -213,3 +213,10 @@ td { padding: 12px; border-top: 1px solid var(--line); }
     .search.off { display: none; }
     .topbar:has(.search.off) { display: none; }
 }
+
+/* ===== Links to other areas and logout (added when the page moved to the project root) ===== */
+.brand { text-decoration: none; color: inherit; }
+.menu-links { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--line); }
+a.menu-item { text-decoration: none; }
+.profile .logout { margin-left: auto; font-size: 0.85rem; color: var(--primary-dark); text-decoration: none; font-weight: 600; }
+.profile .logout:hover { text-decoration: underline; }
