@@ -40,17 +40,191 @@
     // The mobile menu and the footer year are handled by js/nav.js.
     $('welcome').textContent = 'Demo session: ' + data.courier.name + '.';
 
+    // ---------- Vehicle documents (expiry alerts) ----------
+    var DOC_LABEL = { insurance: 'insurance certificate', inspection: 'inspection certificate' };
+    var APPROVAL_LABEL = { approved: 'Approved', pending: 'Pending approval', disapproved: 'Disapproved' };
+
+    function todayIso() {
+        var d = new Date();
+        return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+
+    // Whole days from today until the given YYYY-MM-DD date (negative = already expired).
+    function daysUntil(iso) {
+        return Math.round((Date.parse(iso) - Date.parse(todayIso())) / 86400000);
+    }
+
+    function formatDate(iso) {
+        var p = iso.split('-');
+        return p[2] + '/' + p[1] + '/' + p[0];
+    }
+
+    // 'expired' | 'expiring' | 'valid'
+    function docState(iso) {
+        var n = daysUntil(iso);
+        if (n < 0) { return 'expired'; }
+        return n <= data.alert_window_days ? 'expiring' : 'valid';
+    }
+
+    function docText(iso) {
+        var n = daysUntil(iso);
+        if (n < 0) { return 'Expired on ' + formatDate(iso); }
+        if (n === 0) { return 'Expires today'; }
+        if (n <= data.alert_window_days) { return 'Expires in ' + n + (n === 1 ? ' day' : ' days'); }
+        return 'Valid until ' + formatDate(iso);
+    }
+
+    function docsExpired(v) {
+        return docState(v.insurance_expiry_date) === 'expired' || docState(v.inspection_expiry_date) === 'expired';
+    }
+
+    function renderAlerts() {
+        var ul = $('doc-alerts');
+        ul.innerHTML = '';
+        data.vehicles.forEach(function (v) {
+            ['insurance', 'inspection'].forEach(function (kind) {
+                var iso = v[kind + '_expiry_date'];
+                var st = docState(iso);
+                if (st === 'valid') { return; }
+                var li = document.createElement('li');
+                li.className = 'msg ' + (st === 'expired' ? 'msg-error' : 'msg-warn');
+                li.textContent = v.license_plate + ': ' + DOC_LABEL[kind] + ' ' +
+                    (st === 'expired' ? 'expired on ' + formatDate(iso) + '.' : docText(iso).toLowerCase() + ' (' + formatDate(iso) + ').') +
+                    ' Update it to keep the vehicle approved.';
+                ul.appendChild(li);
+            });
+        });
+    }
+
+    function renderDocs() {
+        var body = $('docs-body');
+        body.innerHTML = '';
+        data.vehicles.forEach(function (v) {
+            var tr = document.createElement('tr');
+            var th = document.createElement('th');
+            th.scope = 'row';
+            th.textContent = v.license_plate;
+            tr.appendChild(th);
+
+            [v.insurance_expiry_date, v.inspection_expiry_date].forEach(function (iso) {
+                var td = document.createElement('td');
+                var span = document.createElement('span');
+                span.className = 'doc doc-' + docState(iso);
+                span.textContent = docText(iso);
+                td.appendChild(span);
+                tr.appendChild(td);
+            });
+
+            var tdA = document.createElement('td');
+            var b = document.createElement('span');
+            b.className = 'doc doc-' + (v.approval_status === 'approved' ? 'valid' : v.approval_status === 'pending' ? 'expiring' : 'expired');
+            b.textContent = APPROVAL_LABEL[v.approval_status];
+            tdA.appendChild(b);
+            tr.appendChild(tdA);
+
+            var tdB = document.createElement('td');
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'btn btn-outline';
+            btn.textContent = 'Update';
+            btn.setAttribute('aria-label', 'Update documents of ' + v.license_plate);
+            btn.addEventListener('click', function () { openDocsForm(v); });
+            tdB.appendChild(btn);
+            tr.appendChild(tdB);
+
+            body.appendChild(tr);
+        });
+        $('alert-window').textContent = String(data.alert_window_days);
+    }
+
+    var editingVehicle = null;
+    var DOC_FIELDS = ['d-insurance', 'd-insurance-doc', 'd-inspection', 'd-inspection-doc'];
+
+    function openDocsForm(v) {
+        editingVehicle = v;
+        $('docs-form').reset();
+        DOC_FIELDS.forEach(function (id) { clearError($(id)); });
+        $('docs-form-title').textContent = 'Update documents: ' + v.license_plate;
+        $('docs-form').hidden = false;
+        $('d-insurance').focus();
+    }
+
+    $('docs-cancel').addEventListener('click', function () {
+        $('docs-form').hidden = true;
+        editingVehicle = null;
+    });
+    clearErrorsOnInput($('docs-form'));
+
+    function dateError(value, current) {
+        var e = required(value);
+        if (e) { return e; }
+        if (value <= todayIso()) { return 'The new expiry date must be in the future.'; }
+        if (value < current) { return 'The new date cannot be earlier than the current one (' + formatDate(current) + ').'; }
+        return '';
+    }
+
+    function fileError(input) {
+        var f = input.files[0];
+        if (!f) { return 'Attach the certificate.'; }
+        if (f.type !== 'application/pdf' && f.type.indexOf('image/') !== 0) { return 'The file must be a PDF or an image.'; }
+        return '';
+    }
+
+    $('docs-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+        if (!editingVehicle) { return; }
+        var v = editingVehicle;
+        var checks = [
+            ['d-insurance', dateError($('d-insurance').value, v.insurance_expiry_date)],
+            ['d-insurance-doc', fileError($('d-insurance-doc'))],
+            ['d-inspection', dateError($('d-inspection').value, v.inspection_expiry_date)],
+            ['d-inspection-doc', fileError($('d-inspection-doc'))]
+        ];
+        var ok = true;
+        checks.forEach(function (c) {
+            clearError($(c[0]));
+            if (c[1]) { showError($(c[0]), c[1]); ok = false; }
+        });
+        if (!ok) {
+            showMessage('Fix the highlighted fields to update the documents.', 'error');
+            return;
+        }
+
+        v.insurance_expiry_date = $('d-insurance').value;
+        v.inspection_expiry_date = $('d-inspection').value;
+        var resubmitted = v.approval_status === 'disapproved';
+        if (resubmitted) { v.approval_status = 'pending'; }   // Staff must approve it again
+        $('docs-form').hidden = true;
+        editingVehicle = null;
+        showMessage('Documents of ' + v.license_plate + ' updated. Staff has been notified' +
+            (resubmitted ? ' and will review the vehicle again.' : '.'), 'ok');
+        renderVehicles();
+    });
+
     // ---------- Vehicle ----------
     function renderVehicleSelect() {
         var select = $('vehicle-select');
+        var keep = select.value;
+        select.innerHTML = '<option value="">Select a vehicle…</option>';
         data.vehicles.forEach(function (v) {
             var opt = document.createElement('option');
             opt.value = String(v.id);
-            var approved = v.approval_status === 'approved';
-            opt.textContent = v.license_plate + ' · ' + v.model + (approved ? '' : ' (pending approval)');
-            opt.disabled = !approved;
+            var usable = v.approval_status === 'approved' && !docsExpired(v);
+            var note = v.approval_status !== 'approved' ? ' (' + APPROVAL_LABEL[v.approval_status].toLowerCase() + ')'
+                     : docsExpired(v) ? ' (documents expired)' : '';
+            opt.textContent = v.license_plate + ' · ' + v.model + note;
+            opt.disabled = !usable;
             select.appendChild(opt);
         });
+        select.value = keep;
+        if (select.value !== keep) { select.value = ''; state.vehicleId = null; }
+    }
+
+    function renderVehicles() {
+        renderVehicleSelect();
+        renderVehicleInfo();
+        renderDocs();
+        renderAlerts();
     }
 
     function renderVehicleInfo() {
@@ -468,7 +642,7 @@
         renderMap();
     }
 
-    renderVehicleSelect();
+    renderVehicles();
     initMap();
     renderAll();
 })();

@@ -50,6 +50,7 @@
                 <h1>My deliveries</h1>
                 <p id="welcome">Demo session.</p>
                 <div id="messages" class="messages" role="status" aria-live="polite"></div>
+                <ul class="alert-list" id="doc-alerts" aria-label="Vehicle document alerts"></ul>
             </div>
         </section>
 
@@ -91,6 +92,60 @@
                             <span id="load-volume-text" class="load-text"></span>
                         </div>
                     </div>
+                </section>
+
+                <!-- Vehicle documents -->
+                <section class="panel" id="documents" aria-labelledby="docs-title">
+                    <h2 id="docs-title">Vehicle documents</h2>
+                    <p class="field-help">
+                        Insurance and inspection certificates must be valid. You are alerted
+                        <span id="alert-window">3</span> days before they expire. If they are not updated
+                        by the deadline, Staff may disapprove the vehicle.
+                    </p>
+                    <div class="table-wrap">
+                        <table>
+                            <caption class="visually-hidden">Vehicle documents and approval status</caption>
+                            <thead>
+                                <tr>
+                                    <th scope="col">Vehicle</th>
+                                    <th scope="col">Insurance</th>
+                                    <th scope="col">Inspection</th>
+                                    <th scope="col">Approval</th>
+                                    <th scope="col"><span class="visually-hidden">Actions</span></th>
+                                </tr>
+                            </thead>
+                            <tbody id="docs-body"></tbody>
+                        </table>
+                    </div>
+
+                    <form class="docs-form" id="docs-form" novalidate hidden>
+                        <h3 id="docs-form-title">Update documents</h3>
+                        <p class="field-help">Upload the new certificates and enter their expiry dates. Staff is notified.</p>
+
+                        <div class="field">
+                            <label for="d-insurance">New insurance expiry date</label>
+                            <input id="d-insurance" type="date" aria-describedby="d-insurance-error">
+                            <p class="field-error" id="d-insurance-error"></p>
+                        </div>
+                        <div class="field">
+                            <label for="d-insurance-doc">Insurance certificate (PDF or image)</label>
+                            <input id="d-insurance-doc" type="file" accept=".pdf,image/*" aria-describedby="d-insurance-doc-error">
+                            <p class="field-error" id="d-insurance-doc-error"></p>
+                        </div>
+                        <div class="field">
+                            <label for="d-inspection">New inspection expiry date</label>
+                            <input id="d-inspection" type="date" aria-describedby="d-inspection-error">
+                            <p class="field-error" id="d-inspection-error"></p>
+                        </div>
+                        <div class="field">
+                            <label for="d-inspection-doc">Inspection certificate (PDF or image)</label>
+                            <input id="d-inspection-doc" type="file" accept=".pdf,image/*" aria-describedby="d-inspection-doc-error">
+                            <p class="field-error" id="d-inspection-doc-error"></p>
+                        </div>
+
+                        <button class="btn btn-primary" type="submit">Save documents</button>
+                        <button class="btn btn-ghost" id="docs-cancel" type="button">Cancel</button>
+                    </form>
                 </section>
 
                 <!-- Available orders -->

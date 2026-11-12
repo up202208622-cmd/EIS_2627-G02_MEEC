@@ -117,3 +117,14 @@ tbody tr:last-child td, tbody tr:last-child th { border-bottom: 0; }
     .map-wrap .map { height: 420px; }
     .load-row { grid-template-columns: 150px 1fr 150px; align-items: center; gap: 10px; }
 }
+
+/* Alertas e documentos dos veículos */
+.alert-list { list-style: none; margin: 12px 0 0; padding: 0; }
+.msg-warn { background: #fff4d6; border-color: #e8c76a; color: #6b4a00; }
+.doc { font-size: 0.9rem; font-weight: 600; white-space: nowrap; }
+.doc-valid    { color: #0d5a3a; }
+.doc-expiring { color: #7a4b00; }
+.doc-expired  { color: #8a1f15; }
+.docs-form { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--line); }
+.docs-form h3 { font-size: 1.1rem; }
+#docs-body th { white-space: nowrap; }
