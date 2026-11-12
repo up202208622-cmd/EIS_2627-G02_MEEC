@@ -16,7 +16,7 @@ and a Leaflet map. Sprint 2 adds the database and PHP.
 
 ## How to open
 
-Open `index.html` in a browser (or use the Live Server extension in VS Code).
+Open `index.html` in a browser.
 All pages work offline except the map tiles, which come from OpenStreetMap.
 
 Demo accounts (also shown on the login page):
