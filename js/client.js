@@ -6,10 +6,10 @@ const FEUP = [41.1780, -8.5980];
 
 /* ---------- Sample data ---------- */
 const products = [
-    { id: 1, name: "Box of books", weight: 12.5, volume: 0.04, fragile: false },
-    { id: 2, name: "Monitor 27\"", weight: 6.8, volume: 0.09, fragile: true },
-    { id: 3, name: "Set of glasses", weight: 2.4, volume: 0.02, fragile: true },
-    { id: 4, name: "Office chair", weight: 14, volume: 0.35, fragile: false }
+    { id: 1, description: "Box of books", category: "Other", weight: 12.5, volume: 0.04, created: "2026-10-12" },
+    { id: 2, description: "Monitor 27\"", category: "Electronics", weight: 6.8, volume: 0.09, created: "2026-10-14" },
+    { id: 3, description: "Set of glasses", category: "Other", weight: 2.4, volume: 0.02, created: "2026-10-20" },
+    { id: 4, description: "Office chair", category: "Furniture", weight: 14, volume: 0.35, created: "2026-11-02" }
 ];
 
 const orders = [
@@ -51,7 +51,7 @@ const productById = (id) => products.find((p) => p.id === id);
 const orderProducts = (o) => o.items.map((id) => {
     const p = productById(id);
     if (!p) return "Removed product";
-    return p.fragile ? `${p.name} (fragile)` : p.name;
+    return p.description;
 }).join(", ");
 
 function parseNumber(raw) {
@@ -221,7 +221,7 @@ function renderPicker() {
         ? products.map((p) => `
             <label class="pick">
                 <input type="checkbox" value="${p.id}" ${checked.includes(p.id) ? "checked" : ""}>
-                <span>${esc(p.name)}${p.fragile ? '<em class="tag">Fragile</em>' : ""}</span>
+                <span>${esc(p.description)}<em class="tag">${esc(p.category)}</em></span>
                 <small>${fmt(p.weight, 2)} kg · ${fmt(p.volume, 3)} m³</small>
             </label>`).join("")
         : `<p class="hint">You have no products yet. Register one in "My products".</p>`;
@@ -285,13 +285,11 @@ $("order-form").addEventListener("submit", (e) => {
 });
 
 /* ---------- Produtos ---------- */
-const PRODUCT_FIELDS = ["p-name", "p-weight", "p-volume"];
-const fragileChoice = () => document.querySelector('input[name="p-fragile"]:checked');
-const firstFragileRadio = document.querySelector('input[name="p-fragile"]');
+const PRODUCT_FIELDS = ["p-description", "p-category", "p-weight", "p-volume"];
 
 function productError(id) {
     const value = $(id).value;
-    if (!value.trim()) return "This field is required.";
+    if (!value.trim()) return id === "p-category" ? "Choose a category." : "This field is required.";
     if (id === "p-weight" || id === "p-volume") {
         const n = parseNumber(value);
         if (Number.isNaN(n)) return "Enter a number.";
@@ -305,9 +303,6 @@ PRODUCT_FIELDS.forEach((id) => {
     $(id).addEventListener("input", clear);
 });
 
-document.querySelectorAll('input[name="p-fragile"]').forEach((radio) => {
-    radio.addEventListener("change", () => setError(firstFragileRadio, $("p-fragile-error"), ""));
-});
 
 $("product-form").addEventListener("submit", (e) => {
     e.preventDefault();
@@ -318,9 +313,6 @@ $("product-form").addEventListener("submit", (e) => {
         setError($(id), $(`${id}-error`), message);
         if (message) errors++;
     });
-    const fragileMessage = fragileChoice() ? "" : "Say whether the product is fragile.";
-    setError(firstFragileRadio, $("p-fragile-error"), fragileMessage);
-    if (fragileMessage) errors++;
 
     showSummary($("product-summary"), errors);
     if (errors) {
@@ -328,18 +320,19 @@ $("product-form").addEventListener("submit", (e) => {
         return;
     }
 
-    const name = $("p-name").value.trim();
+    const description = $("p-description").value.trim();
     products.push({
         id: nextProductId++,
-        name,
+        description,
+        category: $("p-category").value,
         weight: parseNumber($("p-weight").value),
         volume: parseNumber($("p-volume").value),
-        fragile: fragileChoice().value === "yes"
+        created: new Date().toISOString().slice(0, 10)
     });
     e.target.reset();
     renderProducts();
     renderPicker();
-    toast(`Product "${name}" registered.`);
+    toast(`Product "${description}" registered.`);
 });
 
 function renderProducts() {
@@ -347,13 +340,14 @@ function renderProducts() {
     $("product-rows").innerHTML = products.length
         ? products.map((p) => `
             <tr>
-                <td>${esc(p.name)}</td>
+                <td>${esc(p.description)}</td>
+                <td>${esc(p.category)}</td>
                 <td class="num nowrap">${fmt(p.weight, 2)} kg</td>
                 <td class="num nowrap">${fmt(p.volume, 3)} m³</td>
-                <td>${p.fragile ? '<span class="badge initiated">Yes</span>' : "No"}</td>
-                <td class="num"><button type="button" class="btn-remove" data-id="${p.id}" aria-label="Remove ${esc(p.name)}">Remove</button></td>
+                <td class="nowrap" title="${esc(p.created)}">${new Date(p.created).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}</td>
+                <td class="num"><button type="button" class="btn-remove" data-id="${p.id}" aria-label="Remove ${esc(p.description)}">Remove</button></td>
             </tr>`).join("")
-        : `<tr><td colspan="5" class="empty">You have no registered products yet.</td></tr>`;
+        : `<tr><td colspan="6" class="empty">You have no registered products yet.</td></tr>`;
 }
 
 $("product-rows").addEventListener("click", (e) => {

@@ -58,7 +58,7 @@
                 <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
                 <input id="search" type="search" placeholder="Search by order number" autocomplete="off">
             </div>
-            <time id="clock" class="clock"></time>
+            <span id="clock" class="clock"></span>
         </header>
 
         <main id="main">
@@ -141,9 +141,21 @@
                         <div class="error-summary" id="product-summary" role="alert" hidden></div>
 
                         <div class="field">
-                            <label for="p-name">Name</label>
-                            <input id="p-name" maxlength="80" autocomplete="off">
-                            <p class="error" id="p-name-error"></p>
+                            <label for="p-description">Description</label>
+                            <input id="p-description" maxlength="80" autocomplete="off" placeholder="e.g. smartphone, shirts">
+                            <p class="error" id="p-description-error"></p>
+                        </div>
+                        <div class="field">
+                            <label for="p-category">Category</label>
+                            <select id="p-category">
+                                <option value="">Choose a category</option>
+                                <option>Electronics</option>
+                                <option>Food</option>
+                                <option>Furniture</option>
+                                <option>Clothes</option>
+                                <option>Other</option>
+                            </select>
+                            <p class="error" id="p-category-error"></p>
                         </div>
                         <div class="row">
                             <div class="field">
@@ -157,14 +169,6 @@
                                 <p class="error" id="p-volume-error"></p>
                             </div>
                         </div>
-                        <fieldset class="radio-group">
-                            <legend>Fragile</legend>
-                            <div class="radios">
-                                <label><input type="radio" name="p-fragile" value="yes"> Yes</label>
-                                <label><input type="radio" name="p-fragile" value="no"> No</label>
-                            </div>
-                            <p class="error" id="p-fragile-error"></p>
-                        </fieldset>
                         <button type="submit" class="btn btn-primary btn-block">Register product</button>
                     </form>
 
@@ -172,7 +176,7 @@
                         <div class="table-scroll">
                             <table>
                                 <thead>
-                                <tr><th>Name</th><th class="num">Weight</th><th class="num">Volume</th><th>Fragile</th><th><span class="visually-hidden">Actions</span></th></tr>
+                                <tr><th>Description</th><th>Category</th><th class="num">Weight</th><th class="num">Volume</th><th>Added</th><th><span class="visually-hidden">Actions</span></th></tr>
                                 </thead>
                                 <tbody id="product-rows"></tbody>
                             </table>
