@@ -2,6 +2,7 @@
 (function () {
     'use strict';
 
+    var session = requireRole('courier');   // sem sessão de estafeta volta ao login (users.js)
     var FEUP = [41.178, -8.596];
     var data = window.COURIER_DATA;
 
@@ -38,7 +39,42 @@
     }
 
     // The mobile menu and the footer year are handled by js/nav.js.
-    $('welcome').textContent = 'Demo session: ' + data.courier.name + '.';
+    function setUserName(name) {
+        $('user-name').textContent = name;
+        $('user-initials').textContent = name.split(' ').map(function (w) { return w.charAt(0); }).slice(0, 2).join('').toUpperCase();
+    }
+    var me = Object.assign({}, findUser(session ? session.email : 'courier@demo.com') || findUser('courier@demo.com'));
+    if (session) { me.name = session.name; }   // name saved in the session (My profile)
+    setUserName(me.name);
+    initProfile({
+        root: $('profile-root'), prefix: 'pf', user: me, onSaved: setUserName,
+        readonly: { label: 'Employee number', value: me.employeeNumber, hint: 'Given by the company; it cannot be changed here.' }
+    });
+
+    // ---------- Sections (chosen by the # in the address, like the Admin page) ----------
+    var SECTIONS = ['deliveries', 'vehicles', 'history', 'profile'];
+
+    function showSection() {
+        var wanted = window.location.hash.replace('#', '');
+        var current = SECTIONS.indexOf(wanted) !== -1 ? wanted : 'deliveries';
+        SECTIONS.forEach(function (id) { $(id).hidden = (id !== current); });
+        Array.prototype.forEach.call(document.querySelectorAll('[data-section]'), function (link) {
+            var active = link.getAttribute('data-section') === current;
+            link.classList.toggle('active', active);
+            if (active) { link.setAttribute('aria-current', 'page'); }
+            else { link.removeAttribute('aria-current'); }
+        });
+        $('side-nav').classList.remove('open');
+        $('side-toggle').setAttribute('aria-expanded', 'false');
+        window.scrollTo(0, 0);
+        if (current === 'deliveries' && map) { map.invalidateSize(); }   // the map was hidden
+    }
+    window.addEventListener('hashchange', showSection);
+
+    $('side-toggle').addEventListener('click', function () {
+        var open = $('side-nav').classList.toggle('open');
+        $('side-toggle').setAttribute('aria-expanded', String(open));
+    });
 
     // ---------- Vehicle documents (expiry alerts) ----------
     var DOC_LABEL = { insurance: 'insurance certificate', inspection: 'inspection certificate' };
@@ -78,23 +114,61 @@
         return docState(v.insurance_expiry_date) === 'expired' || docState(v.inspection_expiry_date) === 'expired';
     }
 
-    function renderAlerts() {
-        var ul = $('doc-alerts');
-        ul.innerHTML = '';
+    // One entry per document that is expired or about to expire.
+    function alertItems() {
+        var items = [];
         data.vehicles.forEach(function (v) {
             ['insurance', 'inspection'].forEach(function (kind) {
                 var iso = v[kind + '_expiry_date'];
                 var st = docState(iso);
-                if (st === 'valid') { return; }
-                var li = document.createElement('li');
-                li.className = 'msg ' + (st === 'expired' ? 'msg-error' : 'msg-warn');
-                li.textContent = v.license_plate + ': ' + DOC_LABEL[kind] + ' ' +
-                    (st === 'expired' ? 'expired on ' + formatDate(iso) + '.' : docText(iso).toLowerCase() + ' (' + formatDate(iso) + ').') +
-                    ' Update it to keep the vehicle approved.';
-                ul.appendChild(li);
+                if (st !== 'valid') {
+                    items.push({
+                        state: st,
+                        text: v.license_plate + ' · ' + (kind === 'insurance' ? 'Insurance' : 'Inspection') + ': ' + docText(iso)
+                    });
+                }
             });
         });
+        return items;
     }
+
+    function renderAlerts() {
+        var items = alertItems();
+        var expired = items.filter(function (i) { return i.state === 'expired'; }).length;
+
+        // Badge in the menu
+        $('docs-badge').textContent = String(items.length);
+        $('docs-badge').classList.toggle('is-zero', items.length === 0);
+
+        // Single bar in "My deliveries"
+        var banner = $('doc-banner');
+        banner.hidden = items.length === 0;
+        banner.classList.toggle('is-critical', expired > 0);
+        if (items.length) {
+            $('doc-banner-title').textContent = expired > 0 ? 'Vehicle documents expired.' : 'Vehicle documents expiring soon.';
+            $('doc-banner-text').textContent = items.length + (items.length === 1 ? ' document needs' : ' documents need') +
+                ' to be updated to keep your vehicles approved.';
+        }
+
+        // List inside the pop-up
+        var ul = $('alert-items');
+        ul.innerHTML = '';
+        items.forEach(function (i) {
+            var li = document.createElement('li');
+            li.className = 'alert-item alert-' + i.state;
+            li.textContent = i.text;
+            ul.appendChild(li);
+        });
+    }
+
+    // Pop-up when the page opens (only if there is something to fix).
+    function openAlertDialog() {
+        var dlg = $('alert-dialog');
+        if (alertItems().length === 0 || typeof dlg.showModal !== 'function') { return; }
+        dlg.showModal();
+    }
+    $('alert-close').addEventListener('click', function () { $('alert-dialog').close(); });
+    $('alert-update').addEventListener('click', function () { $('alert-dialog').close(); });
 
     function renderDocs() {
         var body = $('docs-body');
@@ -645,4 +719,6 @@
     renderVehicles();
     initMap();
     renderAll();
+    showSection();
+    openAlertDialog();
 })();

@@ -36,15 +36,16 @@ client.html  courier.html  staff.html  admin.html     one page per role
 css/     style.css (shared), forms.css (login, register, team), <page>.css
 js/      validation.js, nav.js, users.js (shared), <page>.js
 vendor/  leaflet/ (map library, local copy)
-docs/    ER diagram, use cases, requirements
+Docs/    project documents (see below)
 ```
 
-## Conventions
+## Documentation
 
-- UI text in English; code comments may be in Portuguese.
-- One shared `css/style.css`; each page only adds its own `css/<page>.css`.
-- Forms use `js/validation.js` and one `<p id="<field>-error">` per field.
-- `js/nav.js` only on pages with `#nav-toggle`, `#main-nav` and `#year`.
-- Test accounts live only in `js/users.js`.
-- Validate every page at https://validator.w3.org/ before committing.
-- Work on your own files, `git pull` before every `git push`.
+All project documents are in the `Docs/` folder:
+
+| File | What it is |
+| --- | --- |
+| `Requirements.xlsx` | Functional (RF-01 to RF-38) and non-functional (RNF-01 to RNF-10) requirements, with the page that fulfils each one and its status |
+| `Use_Case_Diagram.pdf` | Use case diagram with the five actors (Visitor, Client, Courier, Staff, Admin) |
+| `ER_Model.pdf` | Entity-relationship model of the database (Sprint 2) |
+| `Pages rough sketch.pdf` | Rough sketches of the pages |

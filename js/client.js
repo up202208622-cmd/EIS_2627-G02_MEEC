@@ -2,6 +2,8 @@
    Data lives in memory and goes back to the sample data when the page is reloaded. */
 "use strict";
 
+const session = requireRole("client");   // sem sessão de cliente volta ao login (users.js)
+
 const FEUP = [41.1780, -8.5980];
 
 /* ---------- Sample data ---------- */
@@ -94,6 +96,8 @@ function showView(name) {
     });
     $("search-box").classList.toggle("off", name !== "active" && name !== "history");
     if (name === "new-order" && map) map.invalidateSize();
+    $("side-nav").classList.remove("open");
+    $("side-toggle").setAttribute("aria-expanded", "false");
     window.scrollTo(0, 0);
 }
 
@@ -227,6 +231,8 @@ function renderPicker() {
         : `<p class="hint">You have no products yet. Register one in "My products".</p>`;
     updateTotals();
 }
+
+$("manage-products").addEventListener("click", () => showView("products"));
 
 function selectedIds() {
     return [...document.querySelectorAll("#product-picker input:checked")].map((c) => Number(c.value));
@@ -427,18 +433,25 @@ document.querySelectorAll(".chip").forEach((chip) => {
     });
 });
 
-/* ---------- Clock ---------- */
-function tick() {
-    $("clock").textContent = new Date().toLocaleString("en-GB", {
-        weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit"
-    });
+/* ---------- Sidebar (small screens) and profile ---------- */
+$("side-toggle").addEventListener("click", () => {
+    const open = $("side-nav").classList.toggle("open");
+    $("side-toggle").setAttribute("aria-expanded", String(open));
+});
+
+function setUserName(name) {
+    $("user-name").textContent = name;
+    $("user-initials").textContent = name.split(" ").map((w) => w.charAt(0)).slice(0, 2).join("").toUpperCase();
 }
+
+const me = Object.assign({}, findUser(session ? session.email : "client@demo.com") || DEMO_USERS[0]);
+if (session) me.name = session.name;   // nome guardado na sessão (My profile)
+setUserName(me.name);
+initProfile({ root: $("profile-root"), prefix: "pf", user: me, onSaved: setUserName });
 
 /* ---------- Start-up ---------- */
 initMap();
 renderProducts();
 renderPicker();
 renderOrders();
-tick();
-setInterval(tick, 30000);
 showView("new-order");

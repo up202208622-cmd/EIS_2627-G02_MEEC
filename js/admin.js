@@ -4,6 +4,8 @@
 // isValidNif, showError, clearError, clearErrorsOnInput, *_RE) e os dados do users.js
 // (DEMO_USERS, COMPANY_DOMAIN, findUser). Esses ficheiros não são alterados aqui.
 
+requireRole('admin');   // sem sessão de admin volta ao login (users.js)
+
 // ===== Dados de teste =====
 const ADMIN_DATA = {
     kpis: [

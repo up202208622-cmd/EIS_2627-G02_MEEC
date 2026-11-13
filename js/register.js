@@ -105,7 +105,7 @@ registerForm.addEventListener('submit', function (event) {
             return required(v) || (PHONE_RE.test(v) ? '' : '9 digits, starting with 2 or 9.');
         }],
         [byId('reg-nif'), function (v) {
-            return required(v) || (isValidNif(v) ? '' : 'Invalid NIF.');
+            return required(v) || (!/^\d{9}$/.test(v) ? 'The NIF must have exactly 9 digits.' : (isValidNif(v) ? '' : 'Invalid NIF. Check the number.'));
         }],
         [byId('reg-password'), function (v) {
             if (required(v)) { return required(v); }

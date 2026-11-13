@@ -51,6 +51,7 @@ loginForm.addEventListener('submit', function (event) {
         return;
     }
 
+    setSession(user);
     showStatus('Welcome, ' + user.name + '. Opening your area...', 'success');
     setTimeout(function () {
         window.location.href = ROLE_PAGES[user.role];

@@ -229,3 +229,38 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 @media (min-width: 768px) {
     .track-card { grid-template-columns: 1fr 1.2fr; align-items: center; gap: 40px; padding: 32px; }
 }
+
+/* O mapa Leaflet usa z-index até 1000; fica contido no seu bloco e não passa por cima do cabeçalho. */
+.leaflet-container { z-index: 0; }
+
+/* ===== My profile (Client e Courier; o Admin tem o seu próprio) ===== */
+.pf-form {
+    display: grid; gap: 18px; max-width: 720px; padding: 24px;
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow);
+}
+.pf-row { display: grid; gap: 18px; grid-template-columns: 1fr; }
+.pf-field label { display: block; margin-bottom: 4px; font-size: 0.9rem; font-weight: 600; }
+.pf-field input {
+    width: 100%; height: 44px; padding: 0 14px; font: inherit; color: inherit;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+}
+.pf-field input:focus { outline: 2px solid var(--primary); outline-offset: -1px; border-color: transparent; }
+.pf-field input[aria-invalid="true"] { border-color: #c23b3b; }
+.pf-field input[readonly] { background: var(--bg); color: var(--ink-soft); }
+.pf-hint { margin: 4px 0 0; font-size: 0.8rem; color: var(--ink-soft); }
+.pf-fieldset { margin: 0; padding: 16px; border: 1px solid var(--line); border-radius: 10px; }
+.pf-fieldset legend { padding: 0 6px; font-weight: 700; }
+.pf-optional { font-weight: 400; color: var(--ink-soft); }
+.pf-password { position: relative; }
+.pf-password input { padding-right: 64px; }
+.pf-toggle {
+    position: absolute; right: 6px; top: 6px; height: 32px; padding: 0 10px;
+    border: 0; border-radius: 8px; background: none; color: var(--primary-dark); font: inherit; font-weight: 600; cursor: pointer;
+}
+.pf-status { margin: 0; min-height: 1.2em; font-weight: 600; }
+.pf-status.success { color: #0d5a3a; }
+.pf-status.error { color: #c23b3b; }
+@media (min-width: 640px) { .pf-row { grid-template-columns: 1fr 1fr; } }
+
+/* A etiqueta do mapa fica contida no bloco da Home e não passa por cima do cabeçalho. */
+.hero-map { isolation: isolate; }

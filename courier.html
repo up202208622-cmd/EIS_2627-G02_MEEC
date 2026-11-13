@@ -12,53 +12,100 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/courier.css">
 </head>
-<body>
+<body class="courier-body">
     <a class="skip-link" href="#main">Skip to content</a>
 
-    <!-- ===== Header / navigation ===== -->
-    <header class="site-header">
-        <div class="container header-inner">
-            <a class="brand" href="index.html">
-                <span class="brand-mark" aria-hidden="true"></span>
-                CourierCMS
-            </a>
+    <div class="courier-layout">
 
-            <button class="nav-toggle" id="nav-toggle" type="button"
-                    aria-expanded="false" aria-controls="main-nav">
-                Menu
-            </button>
+        <!-- ===== Sidebar (same layout as the Admin and Client pages) ===== -->
+        <aside class="sidebar">
+            <div class="sidebar-top">
+                <a class="brand" href="index.html">
+                    <span class="brand-mark" aria-hidden="true"></span>
+                    CourierCMS
+                </a>
+                <button class="nav-toggle" id="side-toggle" type="button"
+                        aria-expanded="false" aria-controls="side-nav">
+                    Menu
+                </button>
+            </div>
 
-            <nav class="main-nav" id="main-nav" aria-label="Main navigation">
-                <ul>
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="courier.html" aria-current="page">Courier</a></li>
+            <div class="side-content" id="side-nav">
+                <p class="side-label">Courier area</p>
+                <nav aria-label="Courier sections">
+                    <ul class="side-nav">
+                        <li>
+                            <a href="#deliveries" data-section="deliveries">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h11v9H3z"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/></svg>
+                                My deliveries
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#vehicles" data-section="vehicles">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.2 8-8 9-4.8-1-8-4.5-8-9V6l8-3z"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg>
+                                Documents
+                                <span class="side-badge" id="docs-badge" role="status">0</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#history" data-section="history">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
+                                Completed orders
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#profile" data-section="profile">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.2 4.1-6.5 8-6.5s7 2.3 8 6.5"/></svg>
+                                My profile
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+
+                <p class="side-label">Other areas</p>
+                <ul class="side-nav side-nav-muted">
+                    <li><a href="index.html">Home page</a></li>
                     <li><a href="team.html">Team</a></li>
                 </ul>
-                <div class="nav-actions">
-                    <a class="btn btn-ghost" href="login.html">Log out</a>
+
+                <div class="side-user">
+                    <span class="avatar" id="user-initials" aria-hidden="true">RM</span>
+                    <div>
+                        <strong id="user-name">Rui Martins</strong>
+                        <span>Courier</span>
+                    </div>
+                    <a class="logout" href="login.html" data-logout title="Log out" aria-label="Log out">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3"/><path d="M10 17l-5-5 5-5"/><path d="M5 12h11"/></svg>
+                    </a>
                 </div>
-            </nav>
-        </div>
-    </header>
-
-    <main id="main">
-
-        <!-- ===== Page header ===== -->
-        <section class="page-head">
-            <div class="container">
-                <p class="eyebrow">Courier panel</p>
-                <h1>My deliveries</h1>
-                <p id="welcome">Demo session.</p>
-                <div id="messages" class="messages" role="status" aria-live="polite"></div>
-                <ul class="alert-list" id="doc-alerts" aria-label="Vehicle document alerts"></ul>
             </div>
-        </section>
+        </aside>
 
-        <div class="container courier-grid">
+        <!-- ===== Content ===== -->
+        <main id="main" class="courier-main">
 
-            <!-- Main column -->
-            <div class="col-main">
+            <div class="notices">
+                <div id="messages" class="messages" role="status" aria-live="polite"></div>
+            </div>
 
+            <!-- My deliveries -->
+            <section class="courier-section" id="deliveries" aria-labelledby="deliv-title">
+                <header class="section-head">
+                    <p class="crumb">Courier / My deliveries</p>
+                    <h1 id="deliv-title">My deliveries</h1>
+                </header>
+
+                <!-- One summary bar; the details are in the pop-up and in the Documents section -->
+                <div class="doc-banner" id="doc-banner" hidden>
+                    <div>
+                        <strong id="doc-banner-title"></strong>
+                        <span id="doc-banner-text"></span>
+                    </div>
+                    <a class="btn btn-primary" href="#vehicles">Update documents</a>
+                </div>
+
+                <div class="courier-grid">
+                    <div class="col-main">
                 <!-- Vehicle -->
                 <section class="panel" id="vehicle" aria-labelledby="vehicle-title">
                     <h2 id="vehicle-title">Active vehicle</h2>
@@ -92,60 +139,6 @@
                             <span id="load-volume-text" class="load-text"></span>
                         </div>
                     </div>
-                </section>
-
-                <!-- Vehicle documents -->
-                <section class="panel" id="documents" aria-labelledby="docs-title">
-                    <h2 id="docs-title">Vehicle documents</h2>
-                    <p class="field-help">
-                        Insurance and inspection certificates must be valid. You are alerted
-                        <span id="alert-window">3</span> days before they expire. If they are not updated
-                        by the deadline, Staff may disapprove the vehicle.
-                    </p>
-                    <div class="table-wrap">
-                        <table>
-                            <caption class="visually-hidden">Vehicle documents and approval status</caption>
-                            <thead>
-                                <tr>
-                                    <th scope="col">Vehicle</th>
-                                    <th scope="col">Insurance</th>
-                                    <th scope="col">Inspection</th>
-                                    <th scope="col">Approval</th>
-                                    <th scope="col"><span class="visually-hidden">Actions</span></th>
-                                </tr>
-                            </thead>
-                            <tbody id="docs-body"></tbody>
-                        </table>
-                    </div>
-
-                    <form class="docs-form" id="docs-form" novalidate hidden>
-                        <h3 id="docs-form-title">Update documents</h3>
-                        <p class="field-help">Upload the new certificates and enter their expiry dates. Staff is notified.</p>
-
-                        <div class="field">
-                            <label for="d-insurance">New insurance expiry date</label>
-                            <input id="d-insurance" type="date" aria-describedby="d-insurance-error">
-                            <p class="field-error" id="d-insurance-error"></p>
-                        </div>
-                        <div class="field">
-                            <label for="d-insurance-doc">Insurance certificate (PDF or image)</label>
-                            <input id="d-insurance-doc" type="file" accept=".pdf,image/*" aria-describedby="d-insurance-doc-error">
-                            <p class="field-error" id="d-insurance-doc-error"></p>
-                        </div>
-                        <div class="field">
-                            <label for="d-inspection">New inspection expiry date</label>
-                            <input id="d-inspection" type="date" aria-describedby="d-inspection-error">
-                            <p class="field-error" id="d-inspection-error"></p>
-                        </div>
-                        <div class="field">
-                            <label for="d-inspection-doc">Inspection certificate (PDF or image)</label>
-                            <input id="d-inspection-doc" type="file" accept=".pdf,image/*" aria-describedby="d-inspection-doc-error">
-                            <p class="field-error" id="d-inspection-doc-error"></p>
-                        </div>
-
-                        <button class="btn btn-primary" type="submit">Save documents</button>
-                        <button class="btn btn-ghost" id="docs-cancel" type="button">Cancel</button>
-                    </form>
                 </section>
 
                 <!-- Available orders -->
@@ -229,10 +222,10 @@
                         </form>
                     </div>
                 </section>
-            </div>
+                    </div>
 
             <!-- Side column: map -->
-            <aside class="col-side" aria-label="Route map">
+                <aside class="col-side" aria-label="Route map">
                 <section class="panel" aria-labelledby="mapa-title">
                     <h2 id="mapa-title">Map</h2>
                     <div class="map-wrap">
@@ -245,11 +238,79 @@
                     <p class="field-help" id="map-caption">Base: FEUP, Porto.</p>
                 </section>
             </aside>
-        </div>
+                </div>
+            </section>
 
-        <!-- ===== Encomendas concluídas ===== -->
-        <section class="container completed" id="completed" aria-labelledby="conc-title">
-            <h2 id="conc-title">Completed orders</h2>
+            <!-- Vehicle documents -->
+            <section class="courier-section" id="vehicles" aria-labelledby="veh-title" hidden>
+                <header class="section-head">
+                    <p class="crumb">Courier / Vehicle documents</p>
+                    <h1 id="veh-title">Vehicle documents</h1>
+                </header>
+                <!-- Vehicle documents -->
+                <section class="panel" id="documents" aria-labelledby="docs-title">
+                    <h2 id="docs-title">Vehicle documents</h2>
+                    <p class="field-help">
+                        Insurance and inspection certificates must be valid. You are alerted
+                        <span id="alert-window">3</span> days before they expire. If they are not updated
+                        by the deadline, Staff may disapprove the vehicle.
+                    </p>
+                    <div class="table-wrap">
+                        <table>
+                            <caption class="visually-hidden">Vehicle documents and approval status</caption>
+                            <thead>
+                                <tr>
+                                    <th scope="col">Vehicle</th>
+                                    <th scope="col">Insurance</th>
+                                    <th scope="col">Inspection</th>
+                                    <th scope="col">Approval</th>
+                                    <th scope="col"><span class="visually-hidden">Actions</span></th>
+                                </tr>
+                            </thead>
+                            <tbody id="docs-body"></tbody>
+                        </table>
+                    </div>
+
+                    <form class="docs-form" id="docs-form" novalidate hidden>
+                        <h3 id="docs-form-title">Update documents</h3>
+                        <p class="field-help">Upload the new certificates and enter their expiry dates. Staff is notified.</p>
+
+                        <div class="field">
+                            <label for="d-insurance">New insurance expiry date</label>
+                            <input id="d-insurance" type="date" aria-describedby="d-insurance-error">
+                            <p class="field-error" id="d-insurance-error"></p>
+                        </div>
+                        <div class="field">
+                            <label for="d-insurance-doc">Insurance certificate (PDF or image)</label>
+                            <input id="d-insurance-doc" type="file" accept=".pdf,image/*" aria-describedby="d-insurance-doc-error">
+                            <p class="field-error" id="d-insurance-doc-error"></p>
+                        </div>
+                        <div class="field">
+                            <label for="d-inspection">New inspection expiry date</label>
+                            <input id="d-inspection" type="date" aria-describedby="d-inspection-error">
+                            <p class="field-error" id="d-inspection-error"></p>
+                        </div>
+                        <div class="field">
+                            <label for="d-inspection-doc">Inspection certificate (PDF or image)</label>
+                            <input id="d-inspection-doc" type="file" accept=".pdf,image/*" aria-describedby="d-inspection-doc-error">
+                            <p class="field-error" id="d-inspection-doc-error"></p>
+                        </div>
+
+                        <button class="btn btn-primary" type="submit">Save documents</button>
+                        <button class="btn btn-ghost" id="docs-cancel" type="button">Cancel</button>
+                    </form>
+                </section>
+
+            </section>
+
+            <!-- Completed orders -->
+            <section class="courier-section" id="history" aria-labelledby="hist-title" hidden>
+                <header class="section-head">
+                    <p class="crumb">Courier / Completed orders</p>
+                    <h1 id="hist-title">Completed orders</h1>
+                </header>
+        <section class="panel" id="completed" aria-labelledby="conc-title">
+            <h2 class="visually-hidden" id="conc-title">Completed orders</h2>
             <div class="table-wrap">
                 <table>
                     <caption class="visually-hidden">Completed orders history</caption>
@@ -265,23 +326,35 @@
                 </table>
             </div>
         </section>
-    </main>
+            </section>
 
-    <!-- ===== Footer ===== -->
-    <footer class="site-footer">
-        <div class="container footer-inner">
-            <p>&copy; <span id="year">2026</span> CourierCMS · Enterprise Information Systems project</p>
-            <ul>
-                <li><a href="team.html">Team</a></li>
-                <li><a href="index.html">Home</a></li>
-            </ul>
+            <!-- My profile -->
+            <section class="courier-section" id="profile" aria-labelledby="prof-title" hidden>
+                <header class="section-head">
+                    <p class="crumb">Courier / My profile</p>
+                    <h1 id="prof-title">Personal details</h1>
+                </header>
+                <div id="profile-root"></div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Alert pop-up shown when the page opens (no browser alert()) -->
+    <dialog class="alert-dialog" id="alert-dialog" aria-labelledby="alert-title">
+        <h2 id="alert-title">Vehicle documents need your attention</h2>
+        <p class="field-help">Staff may disapprove a vehicle whose documents are not updated by the deadline.</p>
+        <ul class="alert-items" id="alert-items"></ul>
+        <div class="dialog-actions">
+            <a class="btn btn-primary" id="alert-update" href="#vehicles">Update documents</a>
+            <button class="btn btn-ghost" id="alert-close" type="button">Later</button>
         </div>
-    </footer>
+    </dialog>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
             integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <script src="js/nav.js"></script>
     <script src="js/validation.js"></script>
+    <script src="js/users.js"></script>
+    <script src="js/profile.js"></script>
     <script src="js/courier-data.js"></script>
     <script src="js/courier.js"></script>
 </body>
