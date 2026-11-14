@@ -1,0 +1,334 @@
+/* =====================================================
+   Staff page – só para o staff.html.
+   Usa as variáveis do css/style.css (--primary, --accent, --ink, --line, --radius...).
+   A barra lateral, os painéis e a tabela têm o mesmo aspeto da Admin page,
+   mas ficam copiados aqui: cada página só carrega o style.css e o seu próprio CSS.
+   ===================================================== */
+
+:root {
+    --danger: #c23b3b;
+    --danger-bg: #fbe7e7;
+    --warn-bg: #fdf1db;
+    --warn-ink: #8a5a00;
+    --ok-bg: #e3f2f0;
+    --info: #1b4f8f;
+    --info-bg: #e3eefb;
+    --muted: #8396a8;
+    --sidebar-w: 256px;
+}
+
+button, input, select { font: inherit; color: inherit; }
+
+.staff-layout { min-height: 100vh; }
+
+/* ===== Barra lateral ===== */
+.sidebar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+    position: sticky; top: 0; z-index: 1000;
+}
+.sidebar-top {
+    display: flex; align-items: center; justify-content: space-between;
+    min-height: 64px; padding: 0 var(--gutter);
+}
+.side-content { display: none; padding: 0 var(--gutter) 16px; }
+.side-content.open { display: block; }
+
+.side-label {
+    margin: 18px 0 6px; padding: 0 10px;
+    font-size: 0.75rem; font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--muted);
+}
+.side-nav { display: grid; gap: 2px; }
+.side-nav a {
+    display: flex; align-items: center; gap: 12px;
+    padding: 9px 10px; border-radius: 10px;
+    color: var(--ink-soft); text-decoration: none; font-weight: 500;
+    transition: background 0.2s, color 0.2s;
+}
+.side-nav a:hover { background: rgba(16, 36, 58, 0.05); color: var(--ink); }
+.side-nav a.active { background: var(--ok-bg); color: var(--primary-dark); font-weight: 600; }
+.side-nav svg {
+    width: 20px; height: 20px; flex: none;
+    fill: none; stroke: currentColor; stroke-width: 1.8;
+    stroke-linecap: round; stroke-linejoin: round;
+}
+.side-nav-muted a { font-size: 0.92rem; }
+
+.badge {
+    margin-left: auto; min-width: 22px; padding: 1px 7px; border-radius: 999px;
+    background: var(--accent); color: var(--ink);
+    font-size: 0.75rem; font-weight: 700; text-align: center;
+}
+.badge.is-zero { background: var(--line); color: var(--ink-soft); }
+
+.side-user {
+    display: flex; align-items: center; gap: 10px;
+    margin-top: 20px; padding: 12px 10px;
+    border-top: 1px solid var(--line);
+}
+.side-user > div { min-width: 0; }
+.side-user strong { display: block; font-size: 0.95rem; line-height: 1.2; }
+.side-user span { font-size: 0.8rem; color: var(--ink-soft); }
+.side-user .avatar { color: #fff; font-size: 0.85rem; }
+.avatar {
+    width: 38px; height: 38px; flex: none; border-radius: 50%;
+    display: grid; place-items: center;
+    background: var(--primary); color: #fff; font-weight: 700; font-size: 0.85rem;
+}
+.logout {
+    margin-left: auto; padding: 6px; border-radius: 8px;
+    color: var(--ink-soft); text-decoration: none;
+}
+.logout svg {
+    width: 20px; height: 20px; display: block;
+    fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+}
+.logout:hover { color: var(--danger); background: var(--danger-bg); }
+
+/* ===== Área principal ===== */
+.staff-main { min-width: 0; padding: 24px var(--gutter) 48px; max-width: 1240px; }
+.staff-section { display: grid; gap: 16px; scroll-margin-top: 80px; }   /* para o cabeçalho fixo (telemóvel) não tapar o título */
+.staff-section[hidden] { display: none; }
+
+.page-head {
+    display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between;
+    gap: 8px 24px; margin-bottom: 6px;
+}
+.page-head h1 { font-size: clamp(1.5rem, 3.2vw, 2rem); margin: 0; }
+.crumb { margin: 0 0 4px; font-size: 0.85rem; color: var(--muted); font-weight: 500; }
+.today { margin: 0; color: var(--ink-soft); font-size: 0.92rem; }
+
+/* ===== Indicadores ===== */
+.kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.kpi {
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 16px;
+}
+.kpi-label { display: block; font-size: 0.85rem; color: var(--ink-soft); }
+.kpi-value { display: block; margin: 4px 0 2px; font-size: 1.8rem; font-weight: 800; line-height: 1.1; }
+.kpi-note { font-size: 0.8rem; font-weight: 600; color: var(--primary); }
+.kpi.is-warn .kpi-value, .kpi.is-warn .kpi-note { color: var(--warn-ink); }
+.kpi.is-danger .kpi-value, .kpi.is-danger .kpi-note { color: var(--danger); }
+
+/* ===== Painéis ===== */
+.panel {
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 20px; box-shadow: var(--shadow); min-width: 0;
+}
+.panel-head {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    gap: 10px 16px; margin-bottom: 14px;
+}
+.panel h2 { font-size: 1.05rem; margin: 0; }
+.panel-note { font-size: 0.85rem; color: var(--ink-soft); margin: 0; }
+.rule-note { margin-bottom: 12px; }
+.txt-danger { color: var(--danger); font-weight: 700; }
+.txt-warn { color: var(--warn-ink); font-weight: 700; }
+.txt-info { color: var(--info); font-weight: 700; }
+
+/* Separadores (filtro por estado) */
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.tab {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px;
+    background: var(--surface); color: var(--ink-soft); font-size: 0.88rem; font-weight: 600;
+    cursor: pointer; transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.tab:hover { border-color: var(--primary); color: var(--ink); }
+.tab[aria-pressed="true"] { background: var(--primary); border-color: var(--primary); color: #fff; }
+.tab-count {
+    min-width: 20px; padding: 0 6px; border-radius: 999px;
+    background: var(--bg); color: var(--ink-soft); font-size: 0.75rem; text-align: center;
+}
+.tab[aria-pressed="true"] .tab-count { background: rgba(255, 255, 255, 0.25); color: #fff; }
+
+/* ===== Tabelas ===== */
+.table-wrap { position: relative; overflow-x: auto;margin: 0 -20px; padding: 0 20px; }
+.data-table { width: 100%; border-collapse: collapse; min-width: 860px; font-size: 0.92rem; }
+.data-table th {
+    text-align: left; padding: 10px; white-space: nowrap;
+    font-size: 0.75rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+    color: var(--muted); background: #f8fbfa; border-bottom: 1px solid var(--line);
+}
+.data-table td { padding: 12px 10px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.data-table tbody tr:hover { background: #fafcfc; }
+.data-table tr.is-done td { color: var(--ink-soft); }
+.data-table strong { display: block; }
+.cell-sub { display: block; font-size: 0.82rem; color: var(--ink-soft); }
+.nowrap { white-space: nowrap; }
+.row-actions { display: flex; gap: 6px; justify-content: flex-end; white-space: nowrap; }
+.row-note { display: block; margin-top: 4px; font-size: 0.78rem; color: var(--danger); text-align: right; white-space: nowrap; }
+
+/* Validade dos documentos (RF-28) */
+.doc-date { display: block; font-weight: 600; white-space: nowrap; }
+.doc-state { display: block; font-size: 0.8rem; white-space: nowrap; }
+.doc-expired .doc-date, .doc-expired .doc-state { color: var(--danger); }
+.doc-expiring .doc-date, .doc-expiring .doc-state { color: var(--warn-ink); }
+.doc-valid .doc-state { color: var(--ink-soft); }
+
+.pill {
+    display: inline-block; margin-bottom: 2px; padding: 3px 10px; border-radius: 999px;
+    font-size: 0.78rem; font-weight: 700; white-space: nowrap;
+}
+.pill-pending { background: var(--warn-bg); color: var(--warn-ink); }
+.pill-ok { background: var(--ok-bg); color: var(--primary-dark); }
+.pill-no { background: var(--danger-bg); color: var(--danger); }
+.pill-plain { background: var(--bg); color: var(--ink-soft); border: 1px solid var(--line); }
+
+.empty { margin: 16px 0 0; color: var(--ink-soft); text-align: center; }
+.empty[hidden] { display: none; }
+
+/* Alertas de documentos (frota aprovada) */
+.alert-list { display: grid; gap: 8px; }
+.alert-item {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px;
+    padding: 12px 14px; border-radius: 12px; border-left: 4px solid;
+}
+.alert-item.is-expired { background: var(--danger-bg); border-color: var(--danger); }
+.alert-item.is-expiring { background: var(--warn-bg); border-color: var(--accent); }
+.alert-item.is-updated { background: var(--info-bg); border-color: var(--info); }
+.alert-item p { flex: 1; min-width: 220px; margin: 0; font-size: 0.92rem; }
+.alert-item strong { font-weight: 700; }
+
+/* ===== Botões extra ===== */
+.btn-sm { padding: 6px 14px; font-size: 0.85rem; }
+.btn-danger { border-color: var(--danger); color: var(--danger); background: transparent; }
+.btn-danger:hover { background: var(--danger); color: #fff; }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+button.btn { font-weight: 600; white-space: nowrap; }
+button.btn-ghost { background: transparent; }
+.btn-ghost.btn-sm { border-color: var(--line); background: var(--surface); }
+/* Botões desativados não mudam de cor ao passar o rato */
+.btn-primary:disabled:hover { background: var(--primary); }
+.btn-ghost:disabled:hover { background: var(--surface); }
+.data-table .status-badge { white-space: nowrap; }
+
+/* ===== Rotas ===== */
+.route-grid { display: grid; gap: 16px; }
+.route-list { display: grid; gap: 8px; }
+.route-btn {
+    display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; width: 100%;
+    padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px;
+    background: var(--surface); text-align: left; cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+}
+.route-btn:hover { border-color: var(--primary); }
+.route-btn[aria-pressed="true"] { border-color: var(--primary); background: var(--ok-bg); }
+.route-btn strong { font-size: 0.98rem; }
+.route-btn .cell-sub { grid-column: 1 / -1; }
+
+.route-map-wrap { position: relative; margin-bottom: 16px; }
+.route-map { height: 300px; box-shadow: none; z-index: 0; }
+
+/* Marcadores numerados no mapa (L.divIcon) */
+.stop-pin {
+    display: grid; place-items: center;
+    width: 28px; height: 28px; border-radius: 50%;
+    border: 2px solid #fff; box-shadow: 0 2px 6px rgba(16, 36, 58, 0.35);
+    color: #fff; font-weight: 700; font-size: 0.8rem;
+}
+.pin-origin { background: var(--ink); }
+.pin-completed { background: var(--primary); }
+.pin-in-progress { background: var(--accent); color: var(--ink); }
+.pin-initiated { background: var(--muted); }
+.pin-cancelled { background: var(--danger); }
+
+.stops-title { font-size: 0.95rem; margin-bottom: 10px; }
+.stops { display: grid; gap: 8px; }
+.stops li {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px;
+    padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px;
+}
+.stop-num {
+    display: grid; place-items: center; flex: none;
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--bg); border: 1px solid var(--line); font-weight: 700; font-size: 0.85rem;
+}
+.stop-main { flex: 1; min-width: 160px; }
+.stop-main strong { display: block; line-height: 1.2; }
+
+/* Filtros das tabelas */
+.filters { display: flex; flex-wrap: wrap; gap: 10px; }
+.field-inline { display: flex; align-items: center; gap: 8px; }
+.field-inline label { font-size: 0.85rem; font-weight: 600; color: var(--ink-soft); }
+.field-inline input, .field-inline select {
+    padding: 7px 10px; border: 1px solid var(--line); border-radius: 10px; background: #fff;
+}
+.field-inline input { width: 130px; }
+.field-inline input:focus, .field-inline select:focus,
+.modal select:focus {
+    outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(11, 122, 117, 0.15);
+}
+
+/* ===== Janelas (dialog) ===== */
+/* O padding fica no .modal-body: assim um clique no fundo escuro tem como alvo o próprio <dialog> */
+.modal-body { padding: 24px; }
+.modal {
+    width: min(460px, calc(100% - 32px)); padding: 0;
+    border: 0; border-radius: var(--radius); color: var(--ink);
+    box-shadow: 0 20px 60px rgba(16, 36, 58, 0.3);
+}
+.modal::backdrop { background: rgba(16, 36, 58, 0.45); }
+.modal h2 { font-size: 1.2rem; margin-bottom: 4px; }
+.modal-wide { width: min(760px, calc(100% - 32px)); }
+.modal-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.modal-head h2 { margin: 0; }
+
+.modal .field { display: flex; flex-direction: column; margin-top: 16px; }
+.modal .field label { font-weight: 600; font-size: 0.9rem; margin-bottom: 6px; }
+.modal select { padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+.modal select[aria-invalid="true"] { border-color: var(--danger); background: #fffafa; }
+.field-error { min-height: 1.4em; margin: 4px 0 0; font-size: 0.82rem; color: var(--danger); }
+.form-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+
+/* Prova de entrega */
+.pod-view { display: grid; gap: 20px; }
+.pod-figure { margin: 0; }
+.pod-image {
+    border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: #fff;
+}
+.pod-image svg { display: block; width: 100%; height: auto; }
+.pod-figure figcaption { margin-top: 8px; font-size: 0.82rem; color: var(--ink-soft); }
+.pod-details { display: grid; gap: 10px; margin: 0; }
+.pod-details div { padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.pod-details dt { font-size: 0.8rem; color: var(--ink-soft); }
+.pod-details dd { margin: 2px 0 0; font-weight: 600; }
+
+/* ===== Notificação ===== */
+.toast {
+    position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); z-index: 2000;
+    max-width: calc(100% - 32px);
+    padding: 12px 18px; border-radius: 12px;
+    background: var(--ink); color: #fff; font-weight: 600; font-size: 0.92rem;
+    box-shadow: 0 10px 30px rgba(16, 36, 58, 0.25);
+}
+.toast[hidden] { display: none; }
+
+/* ===== Ecrãs médios ===== */
+@media (min-width: 640px) {
+    .kpi-grid { grid-template-columns: repeat(4, 1fr); }
+    .pod-view { grid-template-columns: 1.3fr 1fr; align-items: start; }
+}
+
+/* O style.css esconde .nav-toggle a partir de 768px; aqui só a partir de 960px */
+@media (min-width: 768px) and (max-width: 959px) {
+    .sidebar .nav-toggle { display: inline-block; }
+}
+
+/* ===== Ecrãs grandes: barra lateral fixa ===== */
+@media (min-width: 960px) {
+    .staff-layout { display: grid; grid-template-columns: var(--sidebar-w) 1fr; }
+    .sidebar {
+        height: 100vh; align-self: start; border-bottom: 0; border-right: 1px solid var(--line);
+        display: flex; flex-direction: column; overflow-y: auto;
+    }
+    .sidebar-top { padding: 0 20px; }
+    .sidebar .nav-toggle { display: none; }
+    .side-content { display: flex; flex-direction: column; flex: 1; padding: 0 12px 12px; }
+    .side-user { margin-top: auto; }
+    .staff-main { padding: 32px 36px 56px; }
+
+    .route-grid { grid-template-columns: 300px 1fr; align-items: start; }
+    .route-map { height: 340px; }
+}

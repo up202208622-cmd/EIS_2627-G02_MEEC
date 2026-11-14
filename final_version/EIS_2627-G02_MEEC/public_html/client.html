@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="CourierCMS client area: create orders, register products and follow your deliveries.">
+    <title>Client – CourierCMS</title>
+    <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/client.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="shell">
+
+    <!-- Sidebar: only switches section inside this page (same layout as the Admin page) -->
+    <aside class="sidebar">
+        <a class="brand" href="index.html">
+            <span class="brand-mark" aria-hidden="true"></span>
+            <span>
+                <strong>CourierCMS</strong>
+                <small>Client area</small>
+            </span>
+        </a>
+
+        <nav class="menu" aria-label="Client area sections">
+            <button type="button" class="menu-item" data-view="new-order">New order</button>
+            <button type="button" class="menu-item" data-view="products">
+                My products <span class="count" id="count-products"></span>
+            </button>
+            <button type="button" class="menu-item" data-view="active">
+                Active orders <span class="count alert" id="count-active"></span>
+            </button>
+            <button type="button" class="menu-item" data-view="history">
+                History <span class="count" id="count-history"></span>
+            </button>
+        </nav>
+
+        <nav class="menu menu-links" aria-label="Other areas">
+            <a class="menu-item" href="index.html">Home page</a>
+            <a class="menu-item" href="team.html">Team</a>
+        </nav>
+
+        <div class="profile">
+            <span class="avatar" aria-hidden="true">AC</span>
+            <div>
+                <strong>Ana Costa</strong>
+                <small>Client</small>
+            </div>
+            <a class="logout" href="login.html" title="Log out" aria-label="Log out">Log out</a>
+        </div>
+    </aside>
+
+    <div class="main">
+        <header class="topbar">
+            <div class="search" id="search-box">
+                <label for="search" class="visually-hidden">Search by order number</label>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+                <input id="search" type="search" placeholder="Search by order number" autocomplete="off">
+            </div>
+            <span id="clock" class="clock"></span>
+        </header>
+
+        <main id="main">
+            <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+            <!-- NOVO PEDIDO -->
+            <section class="view" id="view-new-order" aria-labelledby="t-new">
+                <h1 id="t-new">New order</h1>
+
+                <form id="order-form" class="grid-order" novalidate>
+                    <div class="stack">
+                        <div class="error-summary" id="order-summary" role="alert" hidden></div>
+
+                        <div class="card">
+                            <h2>Origin</h2>
+                            <div class="row">
+                                <div class="field">
+                                    <label for="origin-lat">Latitude</label>
+                                    <input id="origin-lat" inputmode="decimal" placeholder="41.1833" data-coord="lat" autocomplete="off">
+                                    <p class="error" id="origin-lat-error"></p>
+                                </div>
+                                <div class="field">
+                                    <label for="origin-long">Longitude</label>
+                                    <input id="origin-long" inputmode="decimal" placeholder="-8.7000" data-coord="long" autocomplete="off">
+                                    <p class="error" id="origin-long-error"></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h2>Destination</h2>
+                            <div class="row">
+                                <div class="field">
+                                    <label for="dest-lat">Latitude</label>
+                                    <input id="dest-lat" inputmode="decimal" placeholder="41.1780" data-coord="lat" autocomplete="off">
+                                    <p class="error" id="dest-lat-error"></p>
+                                </div>
+                                <div class="field">
+                                    <label for="dest-long">Longitude</label>
+                                    <input id="dest-long" inputmode="decimal" placeholder="-8.5980" data-coord="long" autocomplete="off">
+                                    <p class="error" id="dest-long-error"></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <fieldset class="card">
+                            <legend>Order products</legend>
+                            <div id="product-picker" class="picker"></div>
+                            <p class="error" id="picker-error"></p>
+                            <dl class="totals">
+                                <div><dt>Total weight</dt><dd id="total-weight">0 kg</dd></div>
+                                <div><dt>Total volume</dt><dd id="total-volume">0 m³</dd></div>
+                            </dl>
+                        </fieldset>
+
+                        <button type="submit" class="btn btn-primary btn-block">Submit order</button>
+                    </div>
+
+                    <div class="card map-card">
+                        <div class="map-head">
+                            <h2>Map</h2>
+                            <div class="segmented" role="group" aria-label="Point to set when clicking the map">
+                                <button type="button" class="seg active" data-point="origin">Set origin</button>
+                                <button type="button" class="seg" data-point="dest">Set destination</button>
+                            </div>
+                        </div>
+                        <div id="map" class="map" role="application" aria-label="Map to choose origin and destination"></div>
+                        <p class="hint">Click the map or type the coordinates. The route appears once there is an origin and a destination.</p>
+                    </div>
+                </form>
+            </section>
+
+            <!-- PRODUTOS -->
+            <section class="view" id="view-products" aria-labelledby="t-products" hidden>
+                <h1 id="t-products">My products</h1>
+
+                <div class="grid-products">
+                    <form id="product-form" class="card" novalidate>
+                        <h2 id="product-form-title">Register product</h2>
+                        <div class="error-summary" id="product-summary" role="alert" hidden></div>
+
+                        <div class="field">
+                            <label for="p-description">Description</label>
+                            <input id="p-description" maxlength="80" autocomplete="off" placeholder="e.g. smartphone, shirts">
+                            <p class="error" id="p-description-error"></p>
+                        </div>
+                        <div class="field">
+                            <label for="p-category">Category</label>
+                            <select id="p-category">
+                                <option value="">Choose a category</option>
+                                <option>Electronics</option>
+                                <option>Food</option>
+                                <option>Furniture</option>
+                                <option>Clothes</option>
+                                <option>Other</option>
+                            </select>
+                            <p class="error" id="p-category-error"></p>
+                        </div>
+                        <div class="row">
+                            <div class="field">
+                                <label for="p-weight">Weight (kg)</label>
+                                <input id="p-weight" inputmode="decimal" autocomplete="off">
+                                <p class="error" id="p-weight-error"></p>
+                            </div>
+                            <div class="field">
+                                <label for="p-volume">Volume (m³)</label>
+                                <input id="p-volume" inputmode="decimal" autocomplete="off">
+                                <p class="error" id="p-volume-error"></p>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block" id="product-submit">Register product</button>
+                        <button type="button" class="btn btn-ghost btn-block" id="product-cancel" hidden>Cancel editing</button>
+                    </form>
+
+                    <div class="card table-card">
+                        <div class="table-scroll">
+                            <table>
+                                <thead>
+                                <tr><th>Description</th><th>Category</th><th class="num">Weight</th><th class="num">Volume</th><th>Added</th><th><span class="visually-hidden">Actions</span></th></tr>
+                                </thead>
+                                <tbody id="product-rows"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PEDIDOS ATIVOS -->
+            <section class="view" id="view-active" aria-labelledby="t-active" hidden>
+                <h1 id="t-active">Active orders</h1>
+                <div id="active-list" class="grid-orders"></div>
+            </section>
+
+            <!-- HISTÓRICO -->
+            <section class="view" id="view-history" aria-labelledby="t-history" hidden>
+                <div class="title-row">
+                    <h1 id="t-history">History</h1>
+                    <div class="chips" role="group" aria-label="Filter by status">
+                        <button type="button" class="chip active" data-filter="all">All</button>
+                        <button type="button" class="chip" data-filter="completed">Completed</button>
+                        <button type="button" class="chip" data-filter="cancelled">Cancelled</button>
+                    </div>
+                </div>
+                <div class="card table-card">
+                    <div class="table-scroll">
+                        <table>
+                            <thead>
+                            <tr><th>Order</th><th>Origin</th><th>Destination</th><th>Products</th><th>Courier</th><th>Vehicle</th><th>Date</th><th>Status</th></tr>
+                            </thead>
+                            <tbody id="history-rows"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+</div>
+
+<script src="vendor/leaflet/leaflet.js"></script>
+<script src="js/client.js"></script>
+</body>
+</html>
