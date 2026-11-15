@@ -1,6 +1,6 @@
 // ===== Dados de teste da Staff page =====
 // Sprint 1: ainda não há base de dados, por isso os dados ficam aqui.
-// Os nomes dos campos seguem o modelo ER (Vehicle, Order, Route, Route_Order,
+// Os nomes dos campos seguem o modelo ER (User, Vehicle, Order, Route, Route_Order,
 // Proof_of_Delivery), para no Sprint 2 serem trocados pelos dados do PHP/BD.
 // As datas são relativas a hoje, para os alertas de validade aparecerem sempre na demo.
 // Alguns registos são os mesmos do courier-data.js (veículos e encomendas do Rui Martins),
@@ -23,8 +23,17 @@ const STAFF_DATA = {
     // Origem comum de todas as encomendas (marcador do FEUP, RNF-08)
     origin: { name: 'FEUP', lat: 41.178, long: -8.596 },
 
+    // ===== User (role = courier, status = pending) =====
+    // Pedidos feitos no Register com número CRR-xxxx: o Staff valida a conta do courier.
+    courierRequests: [
+        { id: 21, name: 'Hugo Barbosa',  employee: 'CRR-2041', email: 'hugo.barbosa@gmail.com',  nif: '251876349', phone: '912004518', requested: daysFromToday(-1), status: 'pending' },
+        { id: 22, name: 'Leonor Faria',  employee: 'CRR-2042', email: 'leonor.faria@outlook.pt', nif: '230451985', phone: '934771260', requested: daysFromToday(-2), status: 'pending' },
+        { id: 23, name: 'André Pinto',   employee: 'CRR-2043', email: 'andre.pinto@sapo.pt',     nif: '277133050', phone: '965320417', requested: daysFromToday(-3), status: 'pending' }
+    ],
+
     // ===== Vehicle =====
     // approval_status: 'pending' | 'approved' | 'disapproved' (os mesmos do courier-data.js)
+    // doc_update: o courier carregou um certificado novo e o Staff ainda não o verificou
     vehicles: [
         // --- Pedidos novos (pendentes) ---
         {
@@ -74,9 +83,10 @@ const STAFF_DATA = {
         {
             id: 7, courier: 'Sofia Ribeiro', license_plate: '67-ST-21', model: 'Citroën Berlingo', type_name: 'Van',
             max_weight_kg: 800, max_vol_m3: 4.4, approval_status: 'approved',
-            insurance_expiry_date: daysFromToday(90), inspection_expiry_date: daysFromToday(60),
-            insurance_doc: 'insurance_67-ST-21.pdf', inspection_doc: 'inspection_67-ST-21.pdf',
-            created_at: daysFromToday(-120)
+            insurance_expiry_date: daysFromToday(90), inspection_expiry_date: daysFromToday(365),
+            insurance_doc: 'insurance_67-ST-21.pdf', inspection_doc: 'inspection_67-ST-21_new.pdf',
+            created_at: daysFromToday(-120),
+            doc_update: { kind: 'inspection', uploaded_at: daysFromToday(0) + 'T08:47' }
         },
         {
             id: 9, courier: 'Carlos Nunes', license_plate: '09-UV-54', model: 'Honda Forza 350', type_name: 'Moto',

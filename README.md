@@ -25,8 +25,8 @@ Demo accounts (also shown on the login page):
 | --- | --- | --- |
 | Client | client@demo.com | Client123 |
 | Courier | courier@demo.com | Courier123 |
-| Staff | staff@couriercms.com | Staff1234 |
-| Admin | admin@couriercms.com | Admin1234 |
+| Staff | staff@demo.com | Staff1234 |
+| Admin | admin@demo.com | Admin1234 |
 
 ## Structure
 
@@ -48,4 +48,5 @@ All project documents are in the `Docs/` folder:
 | `Requirements.xlsx` | Functional (RF-01 to RF-38) and non-functional (RNF-01 to RNF-10) requirements, with the page that fulfils each one and its status |
 | `Use_Case_Diagram.pdf` | Use case diagram with the five actors (Visitor, Client, Courier, Staff, Admin) |
 | `ER_Model.pdf` | Entity-relationship model of the database (Sprint 2) |
+| `ER_Model.png` | The same ER model as an image (required by the Sprint 1 delivery) |
 | `Pages rough sketch.pdf` | Rough sketches of the pages |

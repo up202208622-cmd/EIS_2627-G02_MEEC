@@ -129,7 +129,11 @@ fieldset.card legend { position: absolute; top: 22px; left: 22px; padding: 0; }
 }
 .stack > .error-summary { margin-bottom: 0; }
 
-.btn-remove { padding: 4px 12px; border: 0; border-radius: 999px; background: none; color: var(--danger); font-size: 0.85rem; font-weight: 600; }
+.btn-remove, .btn-edit { padding: 4px 12px; border: 0; border-radius: 999px; background: none; font-size: 0.85rem; font-weight: 600; cursor: pointer; }
+.btn-remove { color: var(--danger); }
+.btn-edit { color: var(--primary-dark, var(--primary)); }
+.btn-edit:hover { background: var(--primary-soft, #e6f2f1); }
+tr.is-editing td { background: var(--primary-soft, #e6f2f1); }
 .btn-remove:hover { background: var(--danger-soft); }
 
 .picker { display: flex; flex-direction: column; gap: 6px; max-height: 210px; overflow-y: auto; }
@@ -204,7 +208,7 @@ fieldset.card legend { position: absolute; top: 22px; left: 22px; padding: 0; }
 
 /* ===== Tabelas ===== */
 .card.table-card { padding: 6px 10px; }
-.table-scroll { overflow-x: auto; }
+.table-scroll { position: relative; overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
 th { padding: 12px; color: var(--ink-soft); font-size: 0.8rem; font-weight: 600; text-align: left; white-space: nowrap; }
 td { padding: 12px; border-top: 1px solid var(--line); }

@@ -42,6 +42,15 @@ const ADMIN_DATA = {
     adminExtra: { username: 'palmeida', phone: '912345678', nif: '296030821' }
 };
 
+// Além dos pedidos de exemplo, entram aqui os staff que se registaram no Register
+// (guardados no localStorage pelo users.js). Só entram depois de o Admin aprovar.
+getAccounts().filter(function (acc) { return acc.role === 'staff'; }).forEach(function (acc, i) {
+    ADMIN_DATA.staffRequests.push({
+        id: 1000 + i, name: acc.name, employee: acc.employeeNumber, email: acc.email, nif: acc.nif, phone: acc.phone,
+        requested: acc.requested, status: acc.status === 'active' ? 'approved' : acc.status, stored: true
+    });
+});
+
 // O Admin "com sessão iniciada" é a conta admin do users.js
 const currentAdmin = DEMO_USERS.find(function (user) { return user.role === 'admin'; });
 
@@ -265,7 +274,10 @@ function refreshStaff() {
 
 function setRequestStatus(ids, status) {
     ADMIN_DATA.staffRequests.forEach(function (s) {
-        if (ids.includes(s.id)) { s.status = status; }
+        if (ids.includes(s.id)) {
+            s.status = status;
+            if (s.stored) { setAccountStatus(s.email, status === 'approved' ? 'active' : 'rejected'); }
+        }
     });
     refreshStaff();
 }

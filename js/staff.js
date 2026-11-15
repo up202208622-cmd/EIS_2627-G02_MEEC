@@ -2,14 +2,20 @@
 // Sprint 1: tudo estático. Os dados vêm do staff-data.js (STAFF_DATA) e as alterações
 // (aprovar, recusar, lembretes) só ficam em memória até a página ser recarregada.
 // Usa as funções comuns do validation.js (byId, validate, required, clearError,
-// clearErrorsOnInput) e os dados do users.js (DEMO_USERS). Esses ficheiros não são alterados.
+// clearErrorsOnInput) e os dados do users.js (DEMO_USERS).
 //
-// Requisitos desta página (Docs/Requirements.xlsx):
+// Requisitos desta página (docs/Requirements.xlsx):
 //   RF-26 ver veículos pendentes · RF-27 aprovar/recusar · RF-28 validade a vermelho se expirada
 //   RF-29 consultar encomendas e rotas · RF-30 consultar a e-POD de uma entrega concluída
+//   RF-37 alertas de documentos (incl. certificado novo carregado pelo courier) · RF-38 desaprovar veículo
+//   RF-39 validar contas de courier
 
 // O Staff "com sessão iniciada" é a conta staff do users.js
-const currentStaff = DEMO_USERS.find(function (user) { return user.role === 'staff'; });
+// A página só abre com sessão de staff (senão vai para o login). O nome vem da sessão (My profile).
+const session = requireRole('staff') || { email: '', name: '', role: 'staff' };
+const currentStaff = Object.assign({}, DEMO_USERS.find(function (user) { return user.email === session.email; })
+    || DEMO_USERS.find(function (user) { return user.role === 'staff'; }));
+if (session.name) { currentStaff.name = session.name; }
 
 const STATUS_LABEL = {
     'initiated': 'Initiated',
@@ -17,8 +23,8 @@ const STATUS_LABEL = {
     'completed': 'Completed',
     'cancelled': 'Cancelled'
 };
-const APPROVAL_LABEL = { pending: 'Pending', approved: 'Approved', disapproved: 'Disapproved' };
-const APPROVAL_PILL = { pending: 'pill-pending', approved: 'pill-ok', disapproved: 'pill-no' };
+const APPROVAL_LABEL = { pending: 'Pending', approved: 'Approved', disapproved: 'Disapproved', rejected: 'Rejected' };
+const APPROVAL_PILL = { pending: 'pill-pending', approved: 'pill-ok', disapproved: 'pill-no', rejected: 'pill-no' };
 const DOC_LABEL = { insurance: 'Insurance', inspection: 'Inspection' };
 const POD_LABEL = { signature: 'Signature', photo: 'Photo' };
 
@@ -117,7 +123,7 @@ function docCell(iso) {
 }
 
 // ===== Navegação entre secções (pelo # do endereço, como na Admin page) =====
-const STAFF_SECTIONS = ['vehicles', 'routes', 'epod'];
+const STAFF_SECTIONS = ['vehicles', 'couriers', 'routes', 'epod', 'profile'];
 const sideNav = byId('side-nav');
 const sideToggle = byId('side-toggle');
 let currentSection = null;
@@ -254,12 +260,30 @@ function renderVehicleTable() {
     byId('no-vehicles').hidden = list.length > 0;
 }
 
-// Alertas: veículos já aprovados com documentos expirados ou quase a expirar.
-// O Courier vê o mesmo aviso na sua página; aqui o Staff pode mandar um lembrete.
+// Alertas da frota aprovada:
+//  - documento expirado ou quase a expirar (o Courier vê o mesmo aviso; aqui pode-se mandar um lembrete);
+//  - certificado novo carregado pelo courier, que o Staff tem de verificar (informação atualizada).
+const ALERT_ORDER = { expired: 0, updated: 1, expiring: 2 };
+
 function renderAlerts() {
     const items = [];
 
     vehiclesWithStatus('approved').forEach(function (v) {
+        if (v.doc_update && !v.doc_update.checked) {
+            const kind = v.doc_update.kind;
+            items.push({
+                state: 'updated',
+                html: '<li class="alert-item is-updated">' +
+                    '<p><strong>' + escapeHtml(v.license_plate) + '</strong> · ' + escapeHtml(v.model) +
+                    ' (' + escapeHtml(v.courier) + '): new ' + DOC_LABEL[kind].toLowerCase() +
+                    ' certificate uploaded on ' + formatDateTime(v.doc_update.uploaded_at) +
+                    ' (' + escapeHtml(v[kind + '_doc']) + '), valid until ' + formatDate(v[kind + '_expiry_date']) +
+                    '. Check the document.</p>' +
+                    '<button class="btn btn-primary btn-sm" type="button" data-checked="' + v.id + '">Mark as checked</button>' +
+                    '</li>'
+            });
+        }
+
         ['insurance', 'inspection'].forEach(function (kind) {
             const iso = v[kind + '_expiry_date'];
             const state = docState(iso);
@@ -283,8 +307,8 @@ function renderAlerts() {
         });
     });
 
-    // Expirados primeiro
-    items.sort(function (a, b) { return a.state === 'expired' ? -1 : (b.state === 'expired' ? 1 : 0); });
+    // Expirados primeiro, depois documentos novos, depois os que estão quase a expirar
+    items.sort(function (a, b) { return ALERT_ORDER[a.state] - ALERT_ORDER[b.state]; });
 
     byId('doc-alerts').innerHTML = items.map(function (i) { return i.html; }).join('');
     byId('no-alerts').hidden = items.length > 0;
@@ -329,16 +353,23 @@ byId('vehicle-rows').addEventListener('click', function (event) {
 });
 
 // Lembrete ao courier (simulado: no Sprint 2 seria um email/notificação)
+// e "Mark as checked" para os certificados novos
 byId('doc-alerts').addEventListener('click', function (event) {
-    const btn = event.target.closest('[data-remind]');
-    if (!btn) {
-        return;
+    const remindBtn = event.target.closest('[data-remind]');
+    const checkedBtn = event.target.closest('[data-checked]');
+
+    if (remindBtn) {
+        const v = findVehicle(Number(remindBtn.dataset.remind));
+        v.reminded = v.reminded || {};
+        v.reminded[remindBtn.dataset.kind] = true;
+        renderAlerts();
+        showToast('Reminder sent to ' + v.courier + '.');
+    } else if (checkedBtn) {
+        const v = findVehicle(Number(checkedBtn.dataset.checked));
+        v.doc_update.checked = true;
+        renderAlerts();
+        showToast('New ' + DOC_LABEL[v.doc_update.kind].toLowerCase() + ' certificate of ' + v.license_plate + ' checked.');
     }
-    const v = findVehicle(Number(btn.dataset.remind));
-    v.reminded = v.reminded || {};
-    v.reminded[btn.dataset.kind] = true;
-    renderAlerts();
-    showToast('Reminder sent to ' + v.courier + '.');
 });
 
 // ===== Janela "Disapprove vehicle" =====
@@ -348,6 +379,7 @@ const rejectReason = byId('reject-reason');
 let vehicleToReject = null;
 
 clearErrorsOnInput(rejectForm);
+rejectReason.addEventListener('change', function () { clearError(rejectReason); });
 
 function openRejectDialog(v) {
     vehicleToReject = v;
@@ -379,7 +411,69 @@ byId('reject-cancel').addEventListener('click', function () {
 });
 
 // =====================================================
-// ===== 2. Encomendas e rotas (RF-29)
+// ===== 2. Aprovação de contas de courier (RF-39)
+// =====================================================
+// Além dos pedidos de exemplo, entram aqui os couriers que se registaram no Register
+// (guardados no localStorage pelo users.js). Aprovar/recusar muda o estado da conta,
+// e só depois de aprovada é que o courier consegue entrar.
+getAccounts().filter(function (a) { return a.role === 'courier'; }).forEach(function (a, i) {
+    STAFF_DATA.courierRequests.push({
+        id: 1000 + i, name: a.name, employee: a.employeeNumber, email: a.email, nif: a.nif, phone: a.phone,
+        requested: a.requested, status: a.status === 'active' ? 'approved' : a.status, stored: true
+    });
+});
+
+function pendingCouriers() {
+    return STAFF_DATA.courierRequests.filter(function (c) { return c.status === 'pending'; }).length;
+}
+
+function renderCouriers() {
+    const list = STAFF_DATA.courierRequests;
+
+    byId('courier-rows').innerHTML = list.map(function (c) {
+        const done = c.status !== 'pending';
+        return '<tr' + (done ? ' class="is-done"' : '') + '>' +
+            '<td><strong>' + escapeHtml(c.name) + '</strong><span class="cell-sub">' + escapeHtml(c.email) + '</span></td>' +
+            '<td class="nowrap">' + escapeHtml(c.employee) + '</td>' +
+            '<td>' + escapeHtml(c.nif) + '</td>' +
+            '<td>' + escapeHtml(c.phone) + '</td>' +
+            '<td class="nowrap">' + formatDate(c.requested) + '</td>' +
+            '<td><span class="pill ' + APPROVAL_PILL[c.status] + '">' + APPROVAL_LABEL[c.status] + '</span></td>' +
+            '<td>' + (done ? '' :
+                '<div class="row-actions">' +
+                '<button class="btn btn-primary btn-sm" type="button" data-courier-approve="' + c.id + '">Approve</button>' +
+                '<button class="btn btn-danger btn-sm" type="button" data-courier-reject="' + c.id + '">Reject</button>' +
+                '</div>') + '</td>' +
+            '</tr>';
+    }).join('');
+
+    const pending = pendingCouriers();
+    byId('no-couriers').hidden = list.length > 0;
+    byId('couriers-note').textContent = pending === 1 ? '1 pending' : pending + ' pending';
+    const badge = byId('courier-badge');
+    badge.textContent = pending;
+    badge.classList.toggle('is-zero', pending === 0);
+}
+
+byId('courier-rows').addEventListener('click', function (event) {
+    const approveBtn = event.target.closest('[data-courier-approve]');
+    const rejectBtn = event.target.closest('[data-courier-reject]');
+    const btn = approveBtn || rejectBtn;
+    if (!btn) {
+        return;
+    }
+    const id = Number(approveBtn ? approveBtn.dataset.courierApprove : rejectBtn.dataset.courierReject);
+    const courier = STAFF_DATA.courierRequests.find(function (c) { return c.id === id; });
+    courier.status = approveBtn ? 'approved' : 'rejected';
+    if (courier.stored) { setAccountStatus(courier.email, approveBtn ? 'active' : 'rejected'); }
+    renderCouriers();
+    showToast(approveBtn
+        ? courier.name + ' can now sign in as a courier.'
+        : courier.name + "'s request was rejected.");
+});
+
+// =====================================================
+// ===== 3. Encomendas e rotas (RF-29)
 // =====================================================
 let selectedRouteId = STAFF_DATA.routes[0].id;
 let map = null;
@@ -543,7 +637,7 @@ byId('order-rows').addEventListener('click', function (event) {
 });
 
 // =====================================================
-// ===== 3. Prova de entrega (RF-30)
+// ===== 4. Prova de entrega (RF-30)
 // =====================================================
 const podSearch = byId('pod-search');
 
@@ -735,10 +829,18 @@ byId('today').textContent = new Date().toLocaleDateString('en-GB', {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
 });
 byId('alert-window').textContent = STAFF_DATA.alert_window_days;
-byId('user-name').textContent = currentStaff.name;
-byId('user-initials').textContent = initials(currentStaff.name);
+function setUserName(name) {
+    byId('user-name').textContent = name;
+    byId('user-initials').textContent = initials(name);
+}
+setUserName(currentStaff.name);
+initProfile({
+    root: byId('profile-root'), prefix: 'pf', user: currentStaff, onSaved: setUserName,
+    readonly: { label: 'Employee number', value: currentStaff.employeeNumber, hint: 'Given by the company; it cannot be changed here.' }
+});
 
 refreshVehicles();
+renderCouriers();
 renderRouteList();
 renderRouteDetail();
 renderOrders();

@@ -34,6 +34,7 @@ const FLOW = ["pending", "initiated", "progress", "completed"];
 const STEP_LABELS = ["Pending", "Initiated", "In progress", "Completed"];
 
 let nextProductId = 5;
+let editingProductId = null;   // produto a ser editado (null = a registar um novo)
 let nextOrderNumber = 1049;
 let historyFilter = "all";
 
@@ -290,7 +291,7 @@ $("order-form").addEventListener("submit", (e) => {
     toast(`Order ${id} submitted.`);
 });
 
-/* ---------- Produtos ---------- */
+/* ---------- Produtos (registar, editar, remover) ---------- */
 const PRODUCT_FIELDS = ["p-description", "p-category", "p-weight", "p-volume"];
 
 function productError(id) {
@@ -307,8 +308,32 @@ function productError(id) {
 PRODUCT_FIELDS.forEach((id) => {
     const clear = () => setError($(id), $(`${id}-error`), "");
     $(id).addEventListener("input", clear);
+    $(id).addEventListener("change", clear);
 });
 
+function clearProductErrors() {
+    PRODUCT_FIELDS.forEach((id) => setError($(id), $(`${id}-error`), ""));
+    $("product-summary").hidden = true;
+}
+
+/* Passa o formulário para "editar" (com os dados do produto) ou de volta para "registar". */
+function setProductMode(product) {
+    editingProductId = product ? product.id : null;
+    $("product-form").reset();
+    clearProductErrors();
+    if (product) {
+        $("p-description").value = product.description;
+        $("p-category").value = product.category;
+        $("p-weight").value = String(product.weight);
+        $("p-volume").value = String(product.volume);
+    }
+    $("product-form-title").textContent = product ? "Edit product" : "Register product";
+    $("product-submit").textContent = product ? "Save changes" : "Register product";
+    $("product-cancel").hidden = !product;
+    renderProducts();
+}
+
+$("product-cancel").addEventListener("click", () => setProductMode(null));
 
 $("product-form").addEventListener("submit", (e) => {
     e.preventDefault();
@@ -326,37 +351,50 @@ $("product-form").addEventListener("submit", (e) => {
         return;
     }
 
-    const description = $("p-description").value.trim();
-    products.push({
-        id: nextProductId++,
-        description,
+    const data = {
+        description: $("p-description").value.trim(),
         category: $("p-category").value,
         weight: parseNumber($("p-weight").value),
-        volume: parseNumber($("p-volume").value),
-        created: new Date().toISOString().slice(0, 10)
-    });
-    e.target.reset();
-    renderProducts();
+        volume: parseNumber($("p-volume").value)
+    };
+
+    if (editingProductId !== null) {
+        Object.assign(productById(editingProductId), data);
+        toast(`Product "${data.description}" updated.`);
+    } else {
+        products.push(Object.assign({ id: nextProductId++, created: new Date().toISOString().slice(0, 10) }, data));
+        toast(`Product "${data.description}" registered.`);
+    }
+    setProductMode(null);
     renderPicker();
-    toast(`Product "${description}" registered.`);
+    renderOrders();
 });
 
 function renderProducts() {
     $("count-products").textContent = products.length;
     $("product-rows").innerHTML = products.length
         ? products.map((p) => `
-            <tr>
+            <tr${p.id === editingProductId ? ' class="is-editing"' : ""}>
                 <td>${esc(p.description)}</td>
                 <td>${esc(p.category)}</td>
                 <td class="num nowrap">${fmt(p.weight, 2)} kg</td>
                 <td class="num nowrap">${fmt(p.volume, 3)} m³</td>
                 <td class="nowrap" title="${esc(p.created)}">${new Date(p.created).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}</td>
-                <td class="num"><button type="button" class="btn-remove" data-id="${p.id}" aria-label="Remove ${esc(p.description)}">Remove</button></td>
+                <td class="num nowrap">
+                    <button type="button" class="btn-edit" data-edit="${p.id}" aria-label="Edit ${esc(p.description)}">Edit</button>
+                    <button type="button" class="btn-remove" data-id="${p.id}" aria-label="Remove ${esc(p.description)}">Remove</button>
+                </td>
             </tr>`).join("")
         : `<tr><td colspan="6" class="empty">You have no registered products yet.</td></tr>`;
 }
 
 $("product-rows").addEventListener("click", (e) => {
+    const editBtn = e.target.closest(".btn-edit");
+    if (editBtn) {
+        setProductMode(productById(Number(editBtn.dataset.edit)));
+        $("p-description").focus();
+        return;
+    }
     const button = e.target.closest(".btn-remove");
     if (!button) return;
     const id = Number(button.dataset.id);
@@ -364,6 +402,7 @@ $("product-rows").addEventListener("click", (e) => {
         toast("This product is in an active order and cannot be removed.");
         return;
     }
+    if (id === editingProductId) setProductMode(null);
     products.splice(products.findIndex((p) => p.id === id), 1);
     renderProducts();
     renderPicker();

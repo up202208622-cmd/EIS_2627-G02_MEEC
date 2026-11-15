@@ -7,8 +7,8 @@
 const DEMO_USERS = [
     { email: 'client@demo.com',       password: 'Client123',  name: 'Ana Costa',     role: 'client',  username: 'acosta',   phone: '912345678', nif: '123456789' },
     { email: 'courier@demo.com',      password: 'Courier123', name: 'Rui Martins',   role: 'courier', username: 'rmartins', phone: '918765432', nif: '234567813', employeeNumber: 'CRR-1001' },
-    { email: 'staff@couriercms.com',  password: 'Staff1234',  name: 'Marta Sousa',   role: 'staff'   },
-    { email: 'admin@couriercms.com',  password: 'Admin1234',  name: 'Pedro Almeida', role: 'admin'   }
+    { email: 'staff@demo.com',         password: 'Staff1234',  name: 'Marta Sousa',   role: 'staff',   username: 'msousa',   phone: '913456789', nif: '218765436', employeeNumber: 'STF-2001' },
+    { email: 'admin@demo.com',         password: 'Admin1234',  name: 'Pedro Almeida', role: 'admin'   }
 ];
 
 // Página de destino de cada role.
@@ -19,13 +19,55 @@ const ROLE_PAGES = {
     admin: 'admin.html'
 };
 
-// Domínio dos emails da empresa: só contas de staff e admin o usam.
+// Domínio dos emails da empresa: quem se regista como staff tem de o usar.
+// (As contas de demonstração usam todas @demo.com.)
 const COMPANY_DOMAIN = '@couriercms.com';
+
+// ===== Contas criadas no Register (simuladas) =====
+// Sem base de dados, as contas novas ficam no localStorage com um estado:
+//   active   = pode entrar (clientes, e couriers/staff depois de aprovados)
+//   pending  = à espera de aprovação (courier: Staff; staff: Admin)
+//   rejected = pedido recusado
+// As contas de demonstração (DEMO_USERS) não têm estado: estão sempre ativas.
+// No Sprint 2 isto passa para a tabela User (com password_hash, nunca a password).
+const ACCOUNTS_KEY = 'couriercms_accounts';
+
+function getAccounts() {
+    try {
+        const raw = localStorage.getItem(ACCOUNTS_KEY);
+        return raw ? JSON.parse(raw) : [];
+    } catch (e) {
+        return [];
+    }
+}
+
+function saveAccounts(list) {
+    try {
+        localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(list));
+    } catch (e) { /* sem localStorage: a conta não fica guardada */ }
+}
+
+function addAccount(account) {
+    const list = getAccounts();
+    list.push(account);
+    saveAccounts(list);
+}
+
+function setAccountStatus(email, status) {
+    const wanted = String(email).toLowerCase();
+    const list = getAccounts();
+    list.forEach(function (account) {
+        if (account.email === wanted) { account.status = status; }
+    });
+    saveAccounts(list);
+}
 
 function findUser(email) {
     const wanted = email.toLowerCase();
     return DEMO_USERS.find(function (user) {
         return user.email === wanted;
+    }) || getAccounts().find(function (account) {
+        return account.email === wanted;
     });
 }
 

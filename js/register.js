@@ -38,7 +38,8 @@ function updateRolePreview() {
         rolePreview.innerHTML = 'Account type: <strong>Client</strong>';
     } else {
         rolePreview.innerHTML = 'Account type: <strong>' + ROLE_NAMES[role] +
-                                '</strong> (needs approval before first login)';
+                                '</strong> (needs approval by ' + (role === 'courier' ? 'Staff' : 'an Admin') +
+                                ' before first login)';
     }
 }
 
@@ -127,6 +128,19 @@ registerForm.addEventListener('submit', function (event) {
     // Clientes ficam ativos logo; couriers e staff ficam pendentes de aprovação.
     const role = detectRole();
     const state = (role === 'client') ? 'active' : 'pending';
+
+    addAccount({
+        email: emailInput.value.trim().toLowerCase(),
+        password: byId('reg-password').value,
+        name: byId('reg-name').value.trim(),
+        role: role,
+        username: byId('reg-username').value.trim(),
+        phone: byId('reg-phone').value.trim(),
+        nif: byId('reg-nif').value.trim(),
+        employeeNumber: role === 'client' ? '' : employeeInput.value.trim().toUpperCase(),
+        requested: new Date().toISOString().slice(0, 10),
+        status: state
+    });
 
     registerStatus.textContent = 'Account created. Taking you to the login page...';
     registerStatus.className = 'form-status success';

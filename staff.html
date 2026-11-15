@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="CourierCMS staff panel: approve vehicles, check document expiry dates, follow orders and routes and view proof of delivery.">
+    <meta name="description" content="CourierCMS staff panel: approve couriers and vehicles, check document expiry dates, follow orders and routes and view proof of delivery.">
     <title>Staff – CourierCMS</title>
 
     <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
@@ -41,6 +41,14 @@
                             </a>
                         </li>
                         <li>
+                            <a href="#couriers" data-section="couriers">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><path d="M15.5 11l2 2 4-4"/></svg>
+                                Courier approvals
+                                <span class="badge" id="courier-badge">0</span>
+                                <span class="visually-hidden">pending</span>
+                            </a>
+                        </li>
+                        <li>
                             <a href="#routes" data-section="routes">
                                 <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M8.5 18H16a3 3 0 0 0 0-6H8a3 3 0 0 1 0-6h7.5"/></svg>
                                 Orders and routes
@@ -50,6 +58,12 @@
                             <a href="#epod" data-section="epod">
                                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M8.5 15.5c1.2-1.6 2-1.6 2.6 0s1.6 1.4 2.6-.4 1.6-.8 2.3.4"/></svg>
                                 Proof of delivery
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#profile" data-section="profile">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5"/></svg>
+                                My profile
                             </a>
                         </li>
                     </ul>
@@ -67,7 +81,7 @@
                         <strong id="user-name">Marta Sousa</strong>
                         <span>Staff</span>
                     </div>
-                    <a class="logout" href="login.html" title="Log out" aria-label="Log out">
+                    <a class="logout" href="login.html" data-logout title="Log out" aria-label="Log out">
                         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3"/><path d="M10 17l-5-5 5-5"/><path d="M5 12h11"/></svg>
                     </a>
                 </div>
@@ -78,7 +92,7 @@
         <main id="main" class="staff-main">
 
             <!-- ===== Aprovação de veículos (RF-26, RF-27, RF-28) =====
-                 Os veículos vêm do Courier ("Register vehicle") e ficam pendentes até o Staff decidir.
+                 Os veículos vêm do Courier ("Register a vehicle") e ficam pendentes até o Staff decidir.
                  Use case "Approve vehicle" inclui "Check expiry dates": não se aprova com documentos expirados. -->
             <section class="staff-section" id="vehicles" aria-labelledby="veh-title">
                 <header class="page-head">
@@ -142,13 +156,58 @@
 
                 <article class="panel">
                     <div class="panel-head">
-                        <h2>Document alerts in the approved fleet</h2>
+                        <h2>Document alerts</h2>
                         <span class="panel-note" id="alerts-note"></span>
                     </div>
+                    <p class="panel-note rule-note">
+                        Alerts for approved vehicles with documents that are expired or about to expire,
+                        and for <span class="txt-info">new certificates</span> uploaded by couriers that need checking.
+                    </p>
                     <ul class="alert-list" id="doc-alerts">
                         <!-- Preenchido pelo staff.js -->
                     </ul>
-                    <p class="empty" id="no-alerts" hidden>All approved vehicles have valid documents.</p>
+                    <p class="empty" id="no-alerts" hidden>No alerts. All approved vehicles have valid, checked documents.</p>
+                </article>
+            </section>
+
+            <!-- ===== Aprovação de couriers =====
+                 Os pedidos vêm do Register com número CRR-xxxx: a conta só fica ativa depois do Staff validar. -->
+            <section class="staff-section" id="couriers" aria-labelledby="cour-title" hidden>
+                <header class="page-head">
+                    <div>
+                        <p class="crumb">Staff / Courier approvals</p>
+                        <h1 id="cour-title">Courier accounts</h1>
+                    </div>
+                </header>
+
+                <article class="panel">
+                    <div class="panel-head">
+                        <h2 id="couriers-title">Registration requests</h2>
+                        <span class="panel-note" id="couriers-note"></span>
+                    </div>
+                    <p class="panel-note rule-note">
+                        Check the employee number (CRR-xxxx) and the personal details before activating the account.
+                    </p>
+
+                    <div class="table-wrap">
+                        <table class="data-table" aria-labelledby="couriers-title">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Courier</th>
+                                    <th scope="col">Employee no.</th>
+                                    <th scope="col">NIF</th>
+                                    <th scope="col">Phone</th>
+                                    <th scope="col">Requested</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col"><span class="visually-hidden">Actions</span></th>
+                                </tr>
+                            </thead>
+                            <tbody id="courier-rows">
+                                <!-- Preenchido pelo staff.js -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="empty" id="no-couriers" hidden>No courier requests.</p>
                 </article>
             </section>
 
@@ -277,6 +336,17 @@
                     <p class="empty" id="no-pods" hidden>No deliveries match this search.</p>
                 </article>
             </section>
+
+            <!-- ===== My profile ===== -->
+            <section class="staff-section" id="profile" aria-labelledby="prof-title" hidden>
+                <header class="page-head">
+                    <div>
+                        <p class="crumb">Staff / My profile</p>
+                        <h1 id="prof-title">Personal details</h1>
+                    </div>
+                </header>
+                <article class="panel"><div id="profile-root"></div></article>
+            </section>
         </main>
     </div>
 
@@ -327,10 +397,11 @@
 
     <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
-    <!-- Ficheiros comuns da equipa (não alterados) + os desta página -->
+    <!-- Ficheiros comuns da equipa + os desta página -->
     <script src="vendor/leaflet/leaflet.js"></script>
     <script src="js/validation.js"></script>
     <script src="js/users.js"></script>
+    <script src="js/profile.js"></script>
     <script src="js/staff-data.js"></script>
     <script src="js/staff.js"></script>
 </body>

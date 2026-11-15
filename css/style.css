@@ -210,6 +210,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .track-card h2 { margin: 0 0 6px; }
 .track-card .section-intro { margin-bottom: 0; }
 .track-form .field label { display: block; font-weight: 600; margin-bottom: 6px; }
+.track-card > * { min-width: 0; }   /* a coluna da grelha encolhe em vez de alargar a página */
 .track-row { display: flex; gap: 10px; }
 .track-row input {
     flex: 1; min-width: 0; padding: 11px 14px; border: 1px solid var(--line); border-radius: 10px;

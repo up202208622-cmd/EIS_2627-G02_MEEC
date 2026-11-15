@@ -138,7 +138,7 @@
 
                 <div class="grid-products">
                     <form id="product-form" class="card" novalidate>
-                        <h2>Register product</h2>
+                        <h2 id="product-form-title">Register product</h2>
                         <div class="error-summary" id="product-summary" role="alert" hidden></div>
 
                         <div class="field">
@@ -170,7 +170,8 @@
                                 <p class="error" id="p-volume-error"></p>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary btn-block">Register product</button>
+                        <button type="submit" class="btn btn-primary btn-block" id="product-submit">Register product</button>
+                        <button type="button" class="btn btn-ghost btn-block" id="product-cancel" hidden>Cancel editing</button>
                     </form>
 
                     <div class="card table-card">

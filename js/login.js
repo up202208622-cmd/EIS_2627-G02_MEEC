@@ -51,6 +51,17 @@ loginForm.addEventListener('submit', function (event) {
         return;
     }
 
+    // Contas novas de courier/staff só entram depois de aprovadas
+    if (user.status === 'pending') {
+        showStatus('Your account is waiting for approval by ' + (user.role === 'courier' ? 'Staff' : 'an Admin') +
+                   '. You can sign in once it is approved.', 'error');
+        return;
+    }
+    if (user.status === 'rejected') {
+        showStatus('Your registration was not approved. Please contact CourierCMS.', 'error');
+        return;
+    }
+
     setSession(user);
     showStatus('Welcome, ' + user.name + '. Opening your area...', 'success');
     setTimeout(function () {
