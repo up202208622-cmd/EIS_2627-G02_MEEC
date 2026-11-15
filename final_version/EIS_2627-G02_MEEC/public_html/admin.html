@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="CourierCMS: admin panel with KPIs, staff approvals, rates and profile.">
+    <title>Admin – CourierCMS</title>
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="admin-body">
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <div class="admin-layout">
+
+        <!-- ===== Barra lateral (como na Client page: só muda de secção dentro da página) ===== -->
+        <aside class="sidebar">
+            <div class="sidebar-top">
+                <a class="brand" href="index.html">
+                    <span class="brand-mark" aria-hidden="true"></span>
+                    CourierCMS
+                </a>
+                <button class="nav-toggle" id="side-toggle" type="button"
+                        aria-expanded="false" aria-controls="side-nav">
+                    Menu
+                </button>
+            </div>
+
+            <div class="side-content" id="side-nav">
+                <p class="side-label">Administration</p>
+                <nav aria-label="Admin sections">
+                    <ul class="side-nav">
+                        <li>
+                            <a href="#dashboard" data-section="dashboard">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+                                Dashboard
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#approvals" data-section="approvals">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><path d="M15.5 11l2 2 4-4"/></svg>
+                                Staff approvals
+                                <span class="badge" id="pending-badge" role="status" aria-label="pending requests">0</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#rates" data-section="rates">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 6.5A6.5 6.5 0 1 0 17 17.5"/><path d="M4 10.5h9M4 13.5h9"/></svg>
+                                Rates
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#profile" data-section="profile">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.2 4.1-6.5 8-6.5s7 2.3 8 6.5"/></svg>
+                                My profile
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+
+                <p class="side-label">Other areas</p>
+                <ul class="side-nav side-nav-muted">
+                    <li><a href="index.html">Home page</a></li>
+                    <li><a href="team.html">Team</a></li>
+                </ul>
+
+                <div class="side-user">
+                    <span class="avatar" id="user-initials" aria-hidden="true">PA</span>
+                    <div>
+                        <strong id="user-name">Pedro Almeida</strong>
+                        <span>Administrator</span>
+                    </div>
+                    <a class="logout" href="login.html" title="Log out" aria-label="Log out">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3"/><path d="M10 17l-5-5 5-5"/><path d="M5 12h11"/></svg>
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ===== Conteúdo ===== -->
+        <main id="main" class="admin-main">
+
+            <!-- ===== Dashboard ===== -->
+            <section class="admin-section" id="dashboard" aria-labelledby="dash-title">
+                <header class="page-head">
+                    <div>
+                        <p class="crumb">Admin / Dashboard</p>
+                        <h1 id="dash-title">Operations overview</h1>
+                    </div>
+                    <p class="today" id="today"></p>
+                </header>
+
+                <ul class="kpi-grid" id="kpi-grid">
+                    <!-- Preenchido pelo admin.js a partir dos dados de teste -->
+                </ul>
+
+                <div class="panel-grid">
+                    <article class="panel">
+                        <div class="panel-head">
+                            <h2>Orders in the last 7 days</h2>
+                            <span class="panel-note" id="week-total"></span>
+                        </div>
+                        <div class="bar-chart" id="orders-chart" role="img"
+                             aria-label="Bar chart with the number of orders per day"></div>
+                    </article>
+
+                    <article class="panel">
+                        <div class="panel-head">
+                            <h2>Route status today</h2>
+                            <span class="panel-note" id="routes-total"></span>
+                        </div>
+                        <div class="stack" id="routes-stack" role="img"
+                             aria-label="Routes by status"></div>
+                        <ul class="legend" id="routes-legend"></ul>
+                        <dl class="mini-stats">
+                            <div><dt>Completion rate</dt><dd id="completion-rate">–</dd></div>
+                            <div><dt>Average delivery time</dt><dd id="avg-time">–</dd></div>
+                        </dl>
+                    </article>
+
+                    <article class="panel">
+                        <div class="panel-head">
+                            <h2>Approved fleet by type</h2>
+                            <span class="panel-note" id="fleet-total"></span>
+                        </div>
+                        <ul class="hbars" id="fleet-bars"></ul>
+                    </article>
+
+                    <article class="panel">
+                        <div class="panel-head">
+                            <h2>Pending staff requests</h2>
+                            <a class="panel-link" href="#approvals">See all</a>
+                        </div>
+                        <ul class="mini-list" id="pending-preview"></ul>
+                    </article>
+                </div>
+            </section>
+
+            <!-- ===== Aprovação de staff =====
+                 Os pedidos vêm do Register: número de colaborador STF-xxxx e email @couriercms.com. -->
+            <section class="admin-section" id="approvals" aria-labelledby="apr-title" hidden>
+                <header class="page-head">
+                    <div>
+                        <p class="crumb">Admin / Staff approvals</p>
+                        <h1 id="apr-title">New staff members</h1>
+                    </div>
+                </header>
+
+                <article class="panel">
+                    <div class="panel-head">
+                        <h2>Registration requests</h2>
+                        <div class="bulk">
+                            <span class="panel-note" id="selected-count">0 selected</span>
+                            <button class="btn btn-primary btn-sm" id="approve-selected" type="button" disabled>
+                                Approve selected
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-wrap">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="col-check">
+                                        <input type="checkbox" id="select-all" aria-label="Select all pending requests">
+                                    </th>
+                                    <th scope="col">Staff member</th>
+                                    <th scope="col">Employee no.</th>
+                                    <th scope="col">NIF</th>
+                                    <th scope="col">Phone</th>
+                                    <th scope="col">Requested</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col"><span class="visually-hidden">Actions</span></th>
+                                </tr>
+                            </thead>
+                            <tbody id="staff-rows">
+                                <!-- Preenchido pelo admin.js -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="empty" id="no-pending" hidden>No pending requests. All done!</p>
+                </article>
+            </section>
+
+            <!-- ===== Tarifas ===== -->
+            <section class="admin-section" id="rates" aria-labelledby="rates-title" hidden>
+                <header class="page-head">
+                    <div>
+                        <p class="crumb">Admin / Rates</p>
+                        <h1 id="rates-title">Day and night rates</h1>
+                    </div>
+                </header>
+
+                <div class="panel-grid panel-grid-form">
+                    <form class="panel admin-form" id="rates-form" novalidate>
+                        <fieldset>
+                            <legend>Day period</legend>
+                            <div class="field-row">
+                                <div class="field">
+                                    <label for="day-base">Base price (€)</label>
+                                    <input type="number" id="day-base" name="dayBase" step="0.01" min="0" value="3.50"
+                                           required aria-describedby="day-base-error">
+                                    <p class="field-error" id="day-base-error"></p>
+                                </div>
+                                <div class="field">
+                                    <label for="day-km">Price per km (€)</label>
+                                    <input type="number" id="day-km" name="dayKm" step="0.01" min="0" value="0.60"
+                                           required aria-describedby="day-km-error">
+                                    <p class="field-error" id="day-km-error"></p>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <fieldset>
+                            <legend>Night period</legend>
+                            <div class="field-row">
+                                <div class="field">
+                                    <label for="night-base">Base price (€)</label>
+                                    <input type="number" id="night-base" name="nightBase" step="0.01" min="0" value="5.00"
+                                           required aria-describedby="night-base-error">
+                                    <p class="field-error" id="night-base-error"></p>
+                                </div>
+                                <div class="field">
+                                    <label for="night-km">Price per km (€)</label>
+                                    <input type="number" id="night-km" name="nightKm" step="0.01" min="0" value="0.85"
+                                           required aria-describedby="night-km-error">
+                                    <p class="field-error" id="night-km-error"></p>
+                                </div>
+                            </div>
+                            <div class="field-row">
+                                <div class="field">
+                                    <label for="night-start">Night starts at</label>
+                                    <input type="time" id="night-start" name="nightStart" value="22:00"
+                                           required aria-describedby="night-start-error">
+                                    <p class="field-error" id="night-start-error"></p>
+                                </div>
+                                <div class="field">
+                                    <label for="night-end">Night ends at</label>
+                                    <input type="time" id="night-end" name="nightEnd" value="07:00"
+                                           required aria-describedby="night-end-error">
+                                    <p class="field-error" id="night-end-error"></p>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <div class="form-actions">
+                            <button class="btn btn-primary" type="submit">Save rates</button>
+                            <button class="btn btn-ghost" type="reset">Reset</button>
+                        </div>
+                        <p class="form-status" id="rates-status" role="status"></p>
+                    </form>
+
+                    <aside class="panel preview">
+                        <h2>Price simulator</h2>
+                        <p class="panel-note">Example delivery for the distance you choose.</p>
+                        <div class="field">
+                            <label for="sim-km">Distance (km)</label>
+                            <input type="number" id="sim-km" min="0" step="0.5" value="5">
+                        </div>
+                        <dl class="sim">
+                            <div><dt>Daytime</dt><dd id="sim-day">–</dd></div>
+                            <div><dt>Night-time</dt><dd id="sim-night">–</dd></div>
+                        </dl>
+                        <p class="panel-note" id="sim-window"></p>
+                    </aside>
+                </div>
+            </section>
+
+            <!-- ===== Perfil =====
+                 Campos da entidade User do modelo ER: name, username, email, phone, nif, password_hash. -->
+            <section class="admin-section" id="profile" aria-labelledby="profile-title" hidden>
+                <header class="page-head">
+                    <div>
+                        <p class="crumb">Admin / My profile</p>
+                        <h1 id="profile-title">Personal details</h1>
+                    </div>
+                </header>
+
+                <form class="panel admin-form form-narrow" id="profile-form" novalidate>
+                    <div class="field">
+                        <label for="adm-name">Full name</label>
+                        <input type="text" id="adm-name" name="name" autocomplete="name"
+                               required aria-describedby="adm-name-error">
+                        <p class="field-error" id="adm-name-error"></p>
+                    </div>
+
+                    <div class="field-row">
+                        <div class="field">
+                            <label for="adm-username">Username</label>
+                            <input type="text" id="adm-username" name="username" autocomplete="username"
+                                   required aria-describedby="adm-username-hint adm-username-error">
+                            <p class="field-hint" id="adm-username-hint">3 to 20 letters, numbers, dot or _</p>
+                            <p class="field-error" id="adm-username-error"></p>
+                        </div>
+                        <div class="field">
+                            <label for="adm-email">Email</label>
+                            <input type="email" id="adm-email" name="email" autocomplete="email"
+                                   required aria-describedby="adm-email-error">
+                            <p class="field-error" id="adm-email-error"></p>
+                        </div>
+                    </div>
+
+                    <div class="field-row">
+                        <div class="field">
+                            <label for="adm-phone">Phone</label>
+                            <input type="tel" id="adm-phone" name="phone" autocomplete="tel"
+                                   inputmode="numeric" maxlength="9" required aria-describedby="adm-phone-error">
+                            <p class="field-error" id="adm-phone-error"></p>
+                        </div>
+                        <div class="field">
+                            <label for="adm-nif">NIF (tax number)</label>
+                            <input type="text" id="adm-nif" name="nif" inputmode="numeric"
+                                   maxlength="9" required aria-describedby="adm-nif-error">
+                            <p class="field-error" id="adm-nif-error"></p>
+                        </div>
+                    </div>
+
+                    <fieldset>
+                        <legend>Change password <span class="optional">(optional)</span></legend>
+                        <div class="field-row">
+                            <div class="field">
+                                <label for="adm-password">New password</label>
+                                <div class="password-wrap">
+                                    <input type="password" id="adm-password" name="password"
+                                           autocomplete="new-password"
+                                           aria-describedby="adm-password-hint adm-password-error">
+                                    <button type="button" class="password-toggle"
+                                            data-toggle-password="adm-password" aria-pressed="false">Show</button>
+                                </div>
+                                <p class="field-hint" id="adm-password-hint">At least 8 characters, with letters and numbers</p>
+                                <p class="field-error" id="adm-password-error"></p>
+                            </div>
+                            <div class="field">
+                                <label for="adm-password2">Confirm password</label>
+                                <div class="password-wrap">
+                                    <input type="password" id="adm-password2" name="password2"
+                                           autocomplete="new-password" aria-describedby="adm-password2-error">
+                                    <button type="button" class="password-toggle"
+                                            data-toggle-password="adm-password2" aria-pressed="false">Show</button>
+                                </div>
+                                <p class="field-error" id="adm-password2-error"></p>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <div class="form-actions">
+                        <button class="btn btn-primary" type="submit">Save changes</button>
+                    </div>
+                    <p class="form-status" id="profile-status" role="status"></p>
+                </form>
+            </section>
+        </main>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+    <!-- Ficheiros comuns da equipa + o script desta página -->
+    <script src="js/validation.js"></script>
+    <script src="js/users.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>
