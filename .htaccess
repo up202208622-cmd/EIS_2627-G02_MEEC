@@ -1,4 +1,0 @@
-# Ninguém consegue abrir o config.php pelo browser.
-<Files "config.php">
-    Require all denied
-</Files>
