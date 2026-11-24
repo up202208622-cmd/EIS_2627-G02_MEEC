@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="CourierCMS staff panel: approve couriers and vehicles, check document expiry dates, follow orders and routes and view proof of delivery.">
+    <meta name="description" content="CourierCMS staff panel: approve couriers and vehicles, check certificates, follow the dispatch queue, orders, routes and proof of delivery.">
     <title>Staff – CourierCMS</title>
 
     <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
@@ -15,7 +15,7 @@
 
     <div class="staff-layout">
 
-        <!-- ===== Barra lateral (mesmo layout da Admin page e do esboço) ===== -->
+        <!-- ===== Barra lateral ===== -->
         <aside class="sidebar">
             <div class="sidebar-top">
                 <a class="brand" href="index.html">
@@ -29,45 +29,61 @@
             </div>
 
             <div class="side-content" id="side-nav">
-                <p class="side-label">Staff</p>
+                <p class="side-label">Approvals</p>
                 <nav aria-label="Staff sections">
                     <ul class="side-nav">
                         <li>
                             <a href="#vehicles" data-section="vehicles">
                                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 16V8.5A1.5 1.5 0 0 1 4.5 7H14v9"/><path d="M14 10h3.6l3.4 3.6V16h-2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M9 17h6"/></svg>
-                                Vehicle approvals
-                                <span class="badge" id="pending-badge">0</span>
+                                Vehicles
+                                <span class="badge is-zero" id="badge-vehicles">0</span>
                                 <span class="visually-hidden">pending</span>
                             </a>
                         </li>
                         <li>
                             <a href="#couriers" data-section="couriers">
                                 <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><path d="M15.5 11l2 2 4-4"/></svg>
-                                Courier approvals
-                                <span class="badge" id="courier-badge">0</span>
+                                Courier accounts
+                                <span class="badge is-zero" id="badge-couriers">0</span>
                                 <span class="visually-hidden">pending</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#routes" data-section="routes">
-                                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M8.5 18H16a3 3 0 0 0 0-6H8a3 3 0 0 1 0-6h7.5"/></svg>
-                                Orders and routes
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#epod" data-section="epod">
-                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M8.5 15.5c1.2-1.6 2-1.6 2.6 0s1.6 1.4 2.6-.4 1.6-.8 2.3.4"/></svg>
-                                Proof of delivery
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#profile" data-section="profile">
-                                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5"/></svg>
-                                My profile
                             </a>
                         </li>
                     </ul>
                 </nav>
+
+                <p class="side-label">Operations</p>
+                <ul class="side-nav">
+                    <li>
+                        <a href="#dispatch" data-section="dispatch">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5"/><path d="M9 2h6"/></svg>
+                            Dispatch queue
+                            <span class="badge is-zero" id="badge-dispatch">0</span>
+                            <span class="visually-hidden">waiting</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#routes" data-section="routes">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M8.5 18H16a3 3 0 0 0 0-6H8a3 3 0 0 1 0-6h7.5"/></svg>
+                            Orders and routes
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#epod" data-section="epod">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M8.5 15.5c1.2-1.6 2-1.6 2.6 0s1.6 1.4 2.6-.4 1.6-.8 2.3.4"/></svg>
+                            Proof of delivery
+                        </a>
+                    </li>
+                </ul>
+
+                <p class="side-label">Account</p>
+                <ul class="side-nav">
+                    <li>
+                        <a href="#profile" data-section="profile">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5"/></svg>
+                            My profile
+                        </a>
+                    </li>
+                </ul>
 
                 <p class="side-label">Other areas</p>
                 <ul class="side-nav side-nav-muted">
@@ -76,9 +92,9 @@
                 </ul>
 
                 <div class="side-user">
-                    <span class="avatar" id="user-initials" aria-hidden="true">MS</span>
+                    <span class="avatar" id="user-initials" aria-hidden="true">–</span>
                     <div>
-                        <strong id="user-name">Marta Sousa</strong>
+                        <strong id="user-name">Staff</strong>
                         <span>Staff</span>
                     </div>
                     <a class="logout" href="login.html" data-logout title="Log out" aria-label="Log out">
@@ -91,37 +107,35 @@
         <!-- ===== Conteúdo ===== -->
         <main id="main" class="staff-main">
 
-            <!-- ===== Aprovação de veículos (RF-26, RF-27, RF-28) =====
-                 Os veículos vêm do Courier ("Register a vehicle") e ficam pendentes até o Staff decidir.
-                 Use case "Approve vehicle" inclui "Check expiry dates": não se aprova com documentos expirados. -->
+            <!-- ===== Veículos (aprovação + alertas) ===== -->
             <section class="staff-section" id="vehicles" aria-labelledby="veh-title">
                 <header class="page-head">
                     <div>
-                        <p class="crumb">Staff / Vehicle approvals</p>
+                        <p class="crumb">Staff / Vehicles</p>
                         <h1 id="veh-title">Vehicle approvals</h1>
                     </div>
                     <p class="today" id="today"></p>
                 </header>
 
                 <ul class="kpi-grid" id="kpi-grid">
-                    <!-- Preenchido pelo staff.js -->
+                    <!-- Preenchido pelo staff.js (GET /api/staff/alerts) -->
                 </ul>
 
                 <article class="panel">
                     <div class="panel-head">
                         <h2 id="vehicles-title">Registered vehicles</h2>
                         <div class="tabs" role="group" aria-label="Filter vehicles by status">
-                            <button type="button" class="tab" data-filter="pending" aria-pressed="true">
-                                Pending <span class="tab-count" id="count-pending">0</span>
+                            <button type="button" class="tab" data-vehicle-filter="pending" aria-pressed="true">
+                                Pending <span class="tab-count" id="vcount-pending">0</span>
                             </button>
-                            <button type="button" class="tab" data-filter="approved" aria-pressed="false">
-                                Approved <span class="tab-count" id="count-approved">0</span>
+                            <button type="button" class="tab" data-vehicle-filter="approved" aria-pressed="false">
+                                Approved <span class="tab-count" id="vcount-approved">0</span>
                             </button>
-                            <button type="button" class="tab" data-filter="disapproved" aria-pressed="false">
-                                Disapproved <span class="tab-count" id="count-disapproved">0</span>
+                            <button type="button" class="tab" data-vehicle-filter="disapproved" aria-pressed="false">
+                                Disapproved <span class="tab-count" id="vcount-disapproved">0</span>
                             </button>
-                            <button type="button" class="tab" data-filter="all" aria-pressed="false">
-                                All <span class="tab-count" id="count-all">0</span>
+                            <button type="button" class="tab" data-vehicle-filter="all" aria-pressed="false">
+                                All <span class="tab-count" id="vcount-all">0</span>
                             </button>
                         </div>
                     </div>
@@ -129,8 +143,7 @@
                     <p class="panel-note rule-note">
                         Insurance and inspection must be valid to approve a vehicle.
                         Dates in <span class="txt-danger">red</span> have expired;
-                        dates in <span class="txt-warn">amber</span> expire in the next
-                        <span id="alert-window">3</span> days.
+                        dates in <span class="txt-warn">amber</span> expire in the next 3 days.
                     </p>
 
                     <div class="table-wrap">
@@ -147,7 +160,7 @@
                                 </tr>
                             </thead>
                             <tbody id="vehicle-rows">
-                                <!-- Preenchido pelo staff.js -->
+                                <tr><td colspan="7" class="loading">Loading…</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -160,8 +173,8 @@
                         <span class="panel-note" id="alerts-note"></span>
                     </div>
                     <p class="panel-note rule-note">
-                        Alerts for approved vehicles with documents that are expired or about to expire,
-                        and for <span class="txt-info">new certificates</span> uploaded by couriers that need checking.
+                        Approved vehicles with documents that are expired or about to expire,
+                        and <span class="txt-info">new certificates</span> uploaded by couriers that need checking.
                     </p>
                     <ul class="alert-list" id="doc-alerts">
                         <!-- Preenchido pelo staff.js -->
@@ -170,20 +183,30 @@
                 </article>
             </section>
 
-            <!-- ===== Aprovação de couriers =====
-                 Os pedidos vêm do Register com número CRR-xxxx: a conta só fica ativa depois do Staff validar. -->
+            <!-- ===== Contas de estafeta (RF-39) =====
+                 Pedidos do Register com número CRR-xxxx: a conta só fica ativa depois do Staff validar. -->
             <section class="staff-section" id="couriers" aria-labelledby="cour-title" hidden>
                 <header class="page-head">
                     <div>
-                        <p class="crumb">Staff / Courier approvals</p>
+                        <p class="crumb">Staff / Courier accounts</p>
                         <h1 id="cour-title">Courier accounts</h1>
                     </div>
                 </header>
 
                 <article class="panel">
                     <div class="panel-head">
-                        <h2 id="couriers-title">Registration requests</h2>
-                        <span class="panel-note" id="couriers-note"></span>
+                        <h2 id="couriers-title">Registrations</h2>
+                        <div class="tabs" role="group" aria-label="Filter accounts by status">
+                            <button type="button" class="tab" data-account-filter="pending" aria-pressed="true">
+                                Pending <span class="tab-count" id="acount-pending">0</span>
+                            </button>
+                            <button type="button" class="tab" data-account-filter="active" aria-pressed="false">
+                                Active <span class="tab-count" id="acount-active">0</span>
+                            </button>
+                            <button type="button" class="tab" data-account-filter="rejected" aria-pressed="false">
+                                Rejected <span class="tab-count" id="acount-rejected">0</span>
+                            </button>
+                        </div>
                     </div>
                     <p class="panel-note rule-note">
                         Check the employee number (CRR-xxxx) and the personal details before activating the account.
@@ -203,15 +226,76 @@
                                 </tr>
                             </thead>
                             <tbody id="courier-rows">
+                                <tr><td colspan="7" class="loading">Loading…</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="empty" id="no-couriers" hidden>No accounts here.</p>
+                </article>
+            </section>
+
+            <!-- ===== Fila de despacho (WP3) ===== -->
+            <section class="staff-section" id="dispatch" aria-labelledby="disp-title" hidden>
+                <header class="page-head">
+                    <div>
+                        <p class="crumb">Staff / Dispatch queue</p>
+                        <h1 id="disp-title">Dispatch queue</h1>
+                    </div>
+                    <p class="today"><span class="live-dot" aria-hidden="true"></span> Updates every 5 seconds</p>
+                </header>
+
+                <article class="panel">
+                    <div class="panel-head">
+                        <h2 id="queue-title">Paid orders waiting for a courier</h2>
+                        <span class="panel-note">Each offer goes to the nearest available courier, who has 60 seconds to answer.
+                            A courier who refuses can get the same order again after 10 minutes.</span>
+                    </div>
+                    <div class="table-wrap">
+                        <table class="data-table" aria-labelledby="queue-title">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Order</th>
+                                    <th scope="col">Waiting since</th>
+                                    <th scope="col">Load</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Current offer</th>
+                                    <th scope="col">Refused / no answer</th>
+                                </tr>
+                            </thead>
+                            <tbody id="queue-rows">
+                                <tr><td colspan="6" class="loading">Loading…</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="empty" id="no-queue" hidden>No orders waiting. Every paid order has a courier.</p>
+                </article>
+
+                <article class="panel">
+                    <div class="panel-head">
+                        <h2 id="recent-title">Latest answers</h2>
+                    </div>
+                    <div class="table-wrap">
+                        <table class="data-table data-table-compact" aria-labelledby="recent-title">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Order</th>
+                                    <th scope="col">Courier</th>
+                                    <th scope="col">Distance</th>
+                                    <th scope="col">Answer</th>
+                                    <th scope="col">Offered at</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent-rows">
                                 <!-- Preenchido pelo staff.js -->
                             </tbody>
                         </table>
                     </div>
-                    <p class="empty" id="no-couriers" hidden>No courier requests.</p>
+                    <p class="empty" id="no-recent" hidden>No answers yet.</p>
                 </article>
             </section>
 
-            <!-- ===== Encomendas e rotas (RF-29) ===== -->
+            <!-- ===== Encomendas e rotas (RF-29) =====
+                 Ainda com os dados de exemplo do Sprint 1 (staff-orders.js), até haver a API das encomendas e rotas. -->
             <section class="staff-section" id="routes" aria-labelledby="routes-title" hidden>
                 <header class="page-head">
                     <div>
@@ -219,6 +303,7 @@
                         <h1 id="routes-title">Orders and routes</h1>
                     </div>
                 </header>
+                <p class="sample-note">Sample data: this view will use the orders and routes API.</p>
 
                 <div class="route-grid">
                     <article class="panel">
@@ -227,7 +312,7 @@
                             <span class="panel-note" id="routes-note"></span>
                         </div>
                         <ul class="route-list" id="route-list">
-                            <!-- Preenchido pelo staff.js -->
+                            <!-- Preenchido pelo staff-orders.js -->
                         </ul>
                     </article>
 
@@ -247,7 +332,7 @@
 
                         <h3 class="stops-title">Stops in delivery order</h3>
                         <ol class="stops" id="route-stops">
-                            <!-- Preenchido pelo staff.js -->
+                            <!-- Preenchido pelo staff-orders.js -->
                         </ol>
                     </article>
                 </div>
@@ -289,7 +374,7 @@
                                 </tr>
                             </thead>
                             <tbody id="order-rows">
-                                <!-- Preenchido pelo staff.js -->
+                                <!-- Preenchido pelo staff-orders.js -->
                             </tbody>
                         </table>
                     </div>
@@ -297,7 +382,7 @@
                 </article>
             </section>
 
-            <!-- ===== Prova de entrega (RF-30) ===== -->
+            <!-- ===== Prova de entrega (RF-30) – ainda com dados de exemplo ===== -->
             <section class="staff-section" id="epod" aria-labelledby="epod-title" hidden>
                 <header class="page-head">
                     <div>
@@ -305,6 +390,7 @@
                         <h1 id="epod-title">Proof of delivery (e-POD)</h1>
                     </div>
                 </header>
+                <p class="sample-note">Sample data: this view will use the e-POD API.</p>
 
                 <article class="panel">
                     <div class="panel-head">
@@ -329,7 +415,7 @@
                                 </tr>
                             </thead>
                             <tbody id="pod-rows">
-                                <!-- Preenchido pelo staff.js -->
+                                <!-- Preenchido pelo staff-orders.js -->
                             </tbody>
                         </table>
                     </div>
@@ -337,7 +423,7 @@
                 </article>
             </section>
 
-            <!-- ===== My profile ===== -->
+            <!-- ===== My profile (js/profile.js) ===== -->
             <section class="staff-section" id="profile" aria-labelledby="prof-title" hidden>
                 <header class="page-head">
                     <div>
@@ -350,33 +436,31 @@
         </main>
     </div>
 
-    <!-- ===== Janela: recusar veículo =====
-         Usa o validation.js (validate, required) e o <p id="reject-reason-error">, como os outros formulários. -->
-    <dialog class="modal" id="reject-dialog" aria-labelledby="reject-title">
-        <form class="modal-body" id="reject-form" novalidate>
-            <h2 id="reject-title">Disapprove vehicle</h2>
-            <p class="panel-note" id="reject-vehicle"></p>
+    <!-- ===== Janela: recusar um veículo (com motivo) ou uma conta (só confirmação) =====
+         Usa o validation.js (validate, required) e o <p id="reason-select-error">. -->
+    <dialog class="modal" id="reason-dialog" aria-labelledby="reason-title">
+        <form class="modal-body" id="reason-form" novalidate>
+            <h2 id="reason-title">Disapprove</h2>
+            <p class="panel-note" id="reason-subject"></p>
 
-            <div class="field">
-                <label for="reject-reason">Reason</label>
-                <select id="reject-reason" required aria-describedby="reject-reason-error">
+            <div class="field" id="reason-field">
+                <label for="reason-select">Reason</label>
+                <select id="reason-select" required aria-describedby="reason-select-error">
                     <option value="">Choose a reason…</option>
-                    <option>Expired insurance or inspection</option>
-                    <option>Document is unreadable or incomplete</option>
-                    <option>Vehicle data does not match the documents</option>
-                    <option>Other</option>
                 </select>
-                <p class="field-error" id="reject-reason-error"></p>
+                <p class="field-error" id="reason-select-error"></p>
             </div>
 
+            <p class="form-error" id="reason-status" role="alert"></p>
+
             <div class="form-actions">
-                <button class="btn btn-danger" type="submit">Disapprove</button>
-                <button class="btn btn-ghost" type="button" id="reject-cancel">Cancel</button>
+                <button class="btn btn-danger" type="submit" id="reason-submit">Disapprove</button>
+                <button class="btn btn-ghost" type="button" id="reason-cancel">Cancel</button>
             </div>
         </form>
     </dialog>
 
-    <!-- ===== Janela: ver e-POD ===== -->
+    <!-- ===== Janela: ver e-POD (dados de exemplo) ===== -->
     <dialog class="modal modal-wide" id="pod-dialog" aria-labelledby="pod-title">
         <div class="modal-body">
             <div class="modal-head">
@@ -389,7 +473,7 @@
                     <figcaption id="pod-caption"></figcaption>
                 </figure>
                 <dl class="pod-details" id="pod-details">
-                    <!-- Preenchido pelo staff.js -->
+                    <!-- Preenchido pelo staff-orders.js -->
                 </dl>
             </div>
         </div>
@@ -397,12 +481,15 @@
 
     <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
-    <!-- Ficheiros comuns da equipa + os desta página -->
+    <!-- Comuns da equipa (users.js tem o apiRequest e o requireRole) + esta página -->
     <script src="vendor/leaflet/leaflet.js"></script>
     <script src="js/validation.js"></script>
     <script src="js/users.js"></script>
     <script src="js/profile.js"></script>
-    <script src="js/staff-data.js"></script>
+    <script src="js/fleet-common.js"></script>
     <script src="js/staff.js"></script>
+    <!-- Encomendas, rotas e e-POD: dados de exemplo até haver API -->
+    <script src="js/staff-data.js"></script>
+    <script src="js/staff-orders.js"></script>
 </body>
 </html>

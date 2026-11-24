@@ -276,6 +276,7 @@ button.btn-ghost { background: transparent; }
 .modal-head h2 { margin: 0; }
 
 .modal .field { display: flex; flex-direction: column; margin-top: 16px; }
+.modal .field[hidden] { display: none; }
 .modal .field label { font-weight: 600; font-size: 0.9rem; margin-bottom: 6px; }
 .modal select { padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
 .modal select[aria-invalid="true"] { border-color: var(--danger); background: #fffafa; }
@@ -332,3 +333,49 @@ button.btn-ghost { background: transparent; }
     .route-grid { grid-template-columns: 300px 1fr; align-items: start; }
     .route-map { height: 340px; }
 }
+
+/* =====================================================
+   Sprint 2 – dados da API
+   ===================================================== */
+.loading, .load-error { padding: 20px 12px; text-align: center; color: var(--ink-soft); }
+.load-error { color: var(--danger); }
+.kpi.load-error { grid-column: 1 / -1; }
+
+/* Ligação para abrir o ficheiro do documento */
+.doc-link { display: block; margin-top: 2px; font-size: 0.8rem; font-weight: 600; }
+
+/* Mensagem de erro da API dentro das janelas */
+.form-error { margin: 8px 0 0; font-size: 0.88rem; font-weight: 600; color: var(--danger); }
+.form-error:empty { display: none; }
+
+.toast.is-error { background: var(--danger); }
+
+/* Aviso nas secções que ainda usam dados de exemplo */
+.sample-note {
+    margin: -6px 0 0; padding: 8px 14px; border-radius: 10px;
+    background: var(--warn-bg); color: var(--warn-ink); font-size: 0.88rem; font-weight: 600;
+}
+
+/* Fila de despacho: barra dos 60 s */
+.offer-cell { min-width: 190px; }
+.countdown {
+    display: block; height: 6px; margin-top: 6px; border-radius: 999px;
+    background: var(--line); overflow: hidden;
+}
+.countdown span { display: block; height: 100%; border-radius: 999px; background: var(--accent); transition: width 1s linear; }
+
+.live-dot {
+    display: inline-block; width: 8px; height: 8px; margin-right: 4px; border-radius: 50%;
+    background: var(--primary); animation: live 1.6s ease-in-out infinite;
+}
+@keyframes live { 50% { opacity: 0.25; } }
+
+.data-table-compact { min-width: 560px; }
+
+@media (prefers-reduced-motion: reduce) {
+    .live-dot { animation: none; }
+    .countdown span { transition: none; }
+}
+
+/* Alertas: o texto pode ter ligações (ver os certificados novos) */
+.alert-item p a { font-weight: 600; }
